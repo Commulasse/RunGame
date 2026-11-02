@@ -1308,6 +1308,14 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
 .evp{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:2.6rem;color:var(--c)}
 .slot.evs .spg{margin:4px 12px 0}
 @media (max-width:640px){.atabs{margin:16px -16px 4px;padding:0 8px}.atabs button{padding:12px 10px;font-size:.68rem}.shelf .slot.evs{flex:0 0 160px}}
+
+/* v2.4 */
+.strip span:first-child{padding-left:clamp(20px,5vw,64px)}
+.slot.evs.add{position:relative}
+.slot.evs>.evrw{padding:0}
+.evrw{position:absolute;left:0;right:0;top:0;aspect-ratio:16/10;display:grid;place-items:center;z-index:2;pointer-events:none}
+.evreg{background:var(--c);color:#0c0a12;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px 10px 14px;clip-path:polygon(0 0,100% 0,calc(100% - 9px) 100%,0 100%);filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))}
+.slot.evs.add:hover .evi{filter:grayscale(.3) brightness(.7)}
 </style>
 </head>
 <body>
@@ -1351,7 +1359,7 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
   </div>
 </section>
 <div data-home class="strip">
-  <span>Běžíš kdekoliv</span><span>5 / 10 / 21 km</span><span>Výsledky online</span><span class="hl">TOP10 o věcné ceny</span>
+  <span>Běžíš kdekoliv</span><span>Běž co chceš</span><span>Výsledky online</span><span class="hl">TOP10 o věcné ceny</span>
 </div>
 
 <section data-home class="s2" id="zavody"><div class="w2">
@@ -1364,19 +1372,19 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
 <section data-home class="top3" id="odmeny"><div class="w2">
   <div class="t3h"><h2>Běž o TOP10</h2><p>V dlouhých závodech čekají <b>věcné odměny na prvních 10 závodníků</b> v nejlepším umístění. <b>První tři</b> dostanou balíčky suplementů, ze kterých budou mít opravdovou radost.</p></div>
   <div class="t3g">
-    <div class="t3 b1"><b>01</b><span>Velký balíček suplementů</span></div>
-    <div class="t3 b2"><b>02</b><span>Střední balíček suplementů</span></div>
-    <div class="t3 b3"><b>03</b><span>Balíček suplementů</span></div>
-    <div class="t3 b4"><b>04–10</b><span>Věcná odměna</span></div>
+    <div class="t3 b1"><b>01</b><span>Velký balíček odměn</span></div>
+    <div class="t3 b2"><b>02</b><span>Střední balíček odměn</span></div>
+    <div class="t3 b3"><b>03</b><span>Balíček odměn</span></div>
+    <div class="t3 b4"><b>04–10</b><span>Menší odměny</span></div>
   </div>
-  <p class="t3n">O ceny se běží jen v dlouhých závodech, které trvají víc než 3 dny a km se v nich sčítají. Pořadí se počítá v každém cíli zvlášť: vyhrává nejkratší čas, za který nasbíráš km svého cíle (součet časů schválených běhů). Krátké závody (1, 5, 10 i 21 km jedním během) jsou bez odměn, běžíš je pro sebe a do výsledků. <b>Varianty s medailemi připravujeme.</b></p>
+  <p class="t3n">O ceny se běží jen v dlouhých závodech, které trvají víc než 3 dny a km se v nich sčítají. Každý takový závod má jednu cílovou vzdálenost a vyhrává nejkratší čas, za který ji nasbíráš (součet časů schválených běhů). Kdo naběhá víc, uvidí to ve výsledcích. Jednorázové závody jsou bez odměn, běžíš je pro sebe a do výsledků. <b>Varianty s medailemi připravujeme.</b></p>
   <a class="cut dark" href="#zavody">Chci na start <span aria-hidden="true">→</span></a>
 </div></section>
 
 <section data-home class="s2" id="vysledky-home"><div class="w2">
   <div class="h2r"><h2>Výsledky</h2><label class="rsel mono" for="hr2">Závod a trať<select id="hr2"></select></label></div>
   <div class="rt2" id="hr2-body"></div>
-  <p class="note mono2">Ve výsledcích jsou jen přezdívky. Pořadí se počítá zvlášť pro každou trať. Odměny jen v dlouhých závodech: TOP10 v každém cíli podle nejkratšího času.</p>
+  <p class="note mono2">Ve výsledcích jsou jen přezdívky. Pořadí se počítá zvlášť pro každou trať. Odměny jen v dlouhých závodech: TOP10 podle nejkratšího času na cílovou vzdálenost.</p>
 </div></section>
 
 <section data-home class="s2 stp" id="jak"><div class="w2">
@@ -1391,8 +1399,8 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
 <section data-home class="s2" id="otazky"><div class="w2 fq2">
   <h2>Otázky</h2>
   <div class="faq2">
-    <details><summary>Kdo získá odměnu?</summary><p>Prvních 10 v každém cíli dlouhého závodu. Rozhoduje nejkratší čas, za který nasbíráš cílové km (součet časů schválených běhů). První tři dostanou balíčky suplementů, 4. až 10. místo věcnou odměnu. Adresu si od nich vyžádáme po uzávěrce nahrávání. Krátké závody jsou bez odměn. Varianty s medailemi připravujeme.</p></details>
-    <details><summary>Co dostanu za startovné?</summary><p>Krátký závod stojí 249 Kč, dlouhý vícedenní závod 349 Kč. Za startovné máš startovní číslo předem do e-mailu, deník běhů, místo ve výsledcích a po splnění závodu personalizovaný diplom se jménem, tratí a časem.</p></details>
+    <details><summary>Kdo získá odměnu?</summary><p>Prvních 10 v každém dlouhém závodě. Rozhoduje nejkratší čas, za který nasbíráš cílovou vzdálenost závodu (součet časů schválených běhů). První tři dostanou balíčky suplementů, 4. až 10. místo věcnou odměnu. Adresu si od nich vyžádáme po uzávěrce nahrávání. Jednorázové závody jsou bez odměn, běžíš je pro sebe a do výsledků. Varianty s medailemi připravujeme.</p></details>
+    <details><summary>Co dostanu za startovné?</summary><p>Jednorázový závod stojí 249 Kč, dlouhý vícedenní závod 349 Kč. Za startovné máš startovní číslo předem do e-mailu, deník běhů, místo ve výsledcích a po splnění závodu personalizovaný diplom se jménem, tratí a časem.</p></details>
     <details><summary>Kontrolujete nahrané běhy?</summary><p>Ano, každý nahraný běh ručně kontrolujeme. Když údaje nesedí se screenem nebo souborem, běh ti vrátíme k doplnění s poznámkou.</p></details>
     <details><summary>Můžu místo běhu jít?</summary><p>Jasně. Běh, klus i chůze se počítají, tempo je na tobě. Počítá se i běžecký pás, kolo, koloběžka a brusle ne.</p></details>
     <details><summary>Jak nahraju výsledek?</summary><p>V deníku vložíš screenshot z aplikace nebo hodinek, případně soubor FIT, GPX či TCX. Datum, vzdálenost a čas přečteme za tebe.</p></details>
@@ -1595,7 +1603,7 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
   </div>
   <div data-pane="over">
     <div class="kpis" id="adm-kpi"></div>
-    <div class="sec"><div class="sh"><h3>TOP10 a odměny</h3><p class="note">Odměny jen v dlouhých závodech, pořadí v každém cíli podle nejkratšího času na cílové km (součet časů schválených běhů). 1.–3. balíček suplementů, 4.–10. věcná odměna. Po uzávěrce nahrávání si vyžádej adresy.</p></div><div class="t3a" id="adm-top3"></div></div>
+    <div class="sec"><div class="sh"><h3>TOP10 a odměny</h3><p class="note">Odměny jen v dlouhých závodech, pořadí podle nejkratšího času na cílovou vzdálenost (součet časů schválených běhů). 1.–3. balíček suplementů, 4.–10. věcná odměna. Po uzávěrce nahrávání si vyžádej adresy.</p></div><div class="t3a" id="adm-top3"></div></div>
     <div class="sec"><h3>Závody</h3><div class="aevs" id="adm-evs"></div></div>
     <div class="sec"><h3>Platby převodem</h3>
       <p class="note" style="margin-top:8px">Platby převodem (QR) párujte podle variabilního symbolu. Omylem potvrzenou platbu vrátíte tlačítkem Zrušit platbu.</p>
@@ -1628,7 +1636,7 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
         <label for="e-n">Název<input id="e-n" maxlength="40"></label>
         <label for="e-ne">Název anglicky (nepovinné)<input id="e-ne" maxlength="40"></label>
         <label for="e-word">Krátké slovo na banner (nepovinné)<input id="e-word" maxlength="12"></label>
-        <label for="e-km">Vzdálenosti nebo cíle v km, oddělené čárkou<input id="e-km" placeholder="Např. 5, 10, 21"></label>
+        <label for="e-km">Vzdálenosti v km, oddělené čárkou (dlouhý závod má jen jednu)<input id="e-km" placeholder="Např. 5, 10, 21"></label>
         <label for="e-f">Začátek<input type="date" id="e-f"></label>
         <label for="e-e">Konec<input type="date" id="e-e"></label>
         <label for="e-up">Výsledky lze nahrát do (nepovinné)<input type="date" id="e-up"></label>
@@ -1908,7 +1916,7 @@ var SAMPLE=[["Vítr z hor",21,"1:38:52","2026-09-13"],["Martin_MT",21,"1:51:07",
 var P={start:{n:"Startovné",p:349,i:"Registrace do systému RunGame"},digital:{n:"Digital",p:349,i:"Start, číslo k vytištění, PDF diplom, odznak"},medaile:{n:"Medaile",p:590,i:"Vše z Digital a litá medaile poštou"},plus:{n:"Plus",p:690,i:"Medaile a nákrčník nebo čelenka"},komplet:{n:"Komplet",p:950,i:"Medaile, nákrčník, čelenka a tričko"}};
 var PAY={card:"Kartou",wallet:"Apple Pay / Google Pay",bank:"Převodem"};
 var COLORS=[["var(--lime)","Limetková"],["var(--violet)","Fialová"],["var(--lav)","Levandulová"],["var(--pink)","Růžová"],["var(--ice)","Ledová modrá"],["var(--green)","Zelená"],["var(--yellow)","Žlutá"],["var(--orange)","Oranžová"],["var(--red)","Červená"]];
-var KEY="rungame-demo-v8";
+var KEY="rungame-demo-v9";
 function mock(app,name,km,time,date){
  var s='<svg xmlns="http://www.w3.org/2000/svg" width="360" height="560"><rect width="360" height="560" fill="#15161a"/><rect width="360" height="64" fill="#ff6a13"/><text x="20" y="41" font-family="Arial" font-size="22" font-weight="700" fill="#111">'+app+'</text><text x="20" y="110" font-family="Arial" font-size="18" fill="#bbb">'+name+' · '+date+'</text><path d="M30 300 C80 180 150 330 200 230 S300 190 330 280" stroke="#ff6a13" stroke-width="6" fill="none"/><rect x="20" y="150" width="320" height="200" fill="none" stroke="#333"/><text x="20" y="410" font-family="Arial" font-size="15" fill="#888">Vzdálenost</text><text x="20" y="452" font-family="Arial" font-size="40" font-weight="700" fill="#fff">'+km+' km</text><text x="200" y="410" font-family="Arial" font-size="15" fill="#888">Čas</text><text x="200" y="452" font-family="Arial" font-size="40" font-weight="700" fill="#fff">'+time+'</text><text x="20" y="530" font-family="Arial" font-size="13" fill="#666">Ukázkový screenshot pro testovací data</text></svg>';
  return "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(s);
@@ -2103,9 +2111,9 @@ function sync(){
  $("s-race").textContent=R[cur].n;$("s-date").textContent=R[cur].d;$("s-dist").textContent=dist+" km";
  $("s-pack").textContent=P[pack].n;
  var pz=prizeOk(cur);
- $("s-top3").innerHTML=pz?'<b>TOP10</b><span>Běžíš o věcné odměny. Prvních 10 s nejkratším časem na cílové km získá odměnu, první tři balíčky suplementů.</span>':'<b>Bez odměn</b><span>Krátký závod se běží pro sebe a do výsledků. O ceny se běží v dlouhých závodech.</span>';
+ $("s-top3").innerHTML=pz?'<b>TOP10</b><span>Běžíš o věcné odměny. Prvních 10 s nejkratším časem na cílové km získá odměnu, první tři balíčky suplementů.</span>':'<b>Bez odměn</b><span>Jednorázové závody jsou bez odměn, běžíš je pro sebe a do výsledků. O ceny se běží v dlouhých závodech.</span>';
  $("s-top3").className="t3s"+(pz?" yes":"");
- var pn=$("r-przn");pn.hidden=false;pn.className="przn"+(pz?" yes":"");pn.innerHTML=pz?'<b>Tenhle závod se běží o věcné odměny.</b> Prvních 10 s nejkratším časem na cílové km dostane odměnu, první tři balíčky suplementů.':'Krátké závody jsou bez odměn. O ceny se běží v dlouhých závodech (víc než 3 dny, km se sčítají).';$("s-pay").textContent=PAY[pay];$("s-tot").textContent=money(fee(cur));
+ var pn=$("r-przn");pn.hidden=false;pn.className="przn"+(pz?" yes":"");pn.innerHTML=pz?'<b>Tenhle závod se běží o věcné odměny.</b> Prvních 10 s nejkratším časem na cílové km dostane odměnu, první tři balíčky suplementů.':'Jednorázové závody jsou bez odměn, běžíš je pro sebe a do výsledků. O ceny se běží v dlouhých závodech (víc než 3 dny, km se sčítají).';$("s-pay").textContent=PAY[pay];$("s-tot").textContent=money(fee(cur));
 }
 form.addEventListener("change",function(e){
  var t=e.target;
@@ -2379,6 +2387,8 @@ function demoRunners(o){
  });
  o.users.forEach(function(u){if(u.id==="jana")u.pub=true});
  var L=seedLook();o.events.forEach(function(e){if(L[e.id])for(var x in L[e.id])e[x]=L[e.id][x]});
+ var ONE={rijen:50,listopad:100,zima:200,rok:1000};o.events.forEach(function(e){if(e.kind==="challenge")e.km=[ONE[e.id]||e.km[e.km.length-1]]});
+ o.regs.forEach(function(r){var e=o.events.filter(function(x){return x.id===r.race})[0];if(e&&e.kind==="challenge")r.dist=e.km[0]});
  return o;
 }
 
@@ -2498,7 +2508,7 @@ function renderGame(){
    if(ok){lab="Splněno"}else if(!r.paid){lab="Čeká na platbu"}else if(ch){p=Math.min(100,Math.round(chKm(r)/r.dist*100));lab=kmf(chKm(r))+" / "+r.dist+" km"}else{var st=status(r)[1];lab=st==="pend"?"Čeká na schválení":st==="idle"?"Začíná "+czDate(c.f):st==="bad"?"Vráceno":"Zaběhni "+r.dist+" km"}
    return '<div class="slot evs'+(ok?' got':'')+'" style="--c:'+esc(c.c)+'"><div class="evi" style="'+esc(evPic(c))+'">'+(ok?'<span class="evok">Splněno</span>':'')+'</div><b>'+esc(c.n)+'</b><span>'+lab+'</span>'+(ch&&!ok&&r.paid?'<div class="spg"><i style="width:'+p+'%"></i></div>':'')+'</div>'});
  var open=RK.filter(function(k){var c=R[k];return t<=c.e&&!mine.some(function(r){return r.race===k})}).slice(0,3).map(function(k){var c=R[k];
-   return '<a class="slot evs add" href="#registrace" data-race="'+k+'" style="--c:'+esc(c.c)+'"><div class="evi" style="'+esc(evPic(c))+'"><span class="evp">+</span></div><b>'+esc(c.n)+'</b><span>Registrovat · '+shortRange(c)+'</span></a>'});
+   return '<a class="slot evs add" href="#registrace" data-race="'+k+'" style="--c:'+esc(c.c)+'"><div class="evi" style="'+esc(evPic(c))+'"></div><span class="evrw"><span class="evreg">Registrovat →</span></span><b>'+esc(c.n)+'</b><span>'+shortRange(c)+'</span></a>'});
  var got=mine.filter(done).length;
  $("acc-shelf-n").textContent=got+" z "+mine.length+" splněno";
  $("acc-shelf").innerHTML=slots.concat(open).join("")||'<p class="note">Sbírka je zatím prázdná.</p>';
@@ -2556,7 +2566,7 @@ function renderHr2(){
  var p=hr2v.split("|"),k=p[0],km=+p[1];if(!R[k]){$("hr2-body").innerHTML="";return}
  var ch=isCh(k),d=rows(k),ok=d.ok.filter(function(x){return x.dist===km}).sort(function(a,b){return a.key-b.key}),rest=d.rest.filter(function(x){return x.dist===km});
  var h='<table><thead><tr><th>Pořadí</th><th>Přezdívka</th><th>'+(ch?"Čas na cíl":"Oficiální čas")+'</th><th>Stav</th></tr></thead><tbody>';
- h+=ok.slice(0,10).map(function(x,i){return '<tr><td class="rk">'+(i+1)+'.</td><td class="nk">'+esc(x.nick)+'</td><td class="tm">'+esc(x.time)+'</td><td>'+(function(){var pl=prizeOk(k)&&x.uid?prizePlace(k,x.uid,km):0;return pl?'<span class="bdg2">'+(pl<=3?'Suplementy':'Odměna')+'</span>':''})()+'</td></tr>'}).join("");
+ h+=ok.slice(0,10).map(function(x,i){return '<tr><td class="rk">'+(i+1)+'.</td><td class="nk">'+esc(x.nick)+'</td><td class="tm">'+esc(x.time)+'</td><td>'+(function(){var pl=prizeOk(k)&&x.uid?prizePlace(k,x.uid,km):0;return pl?'<span class="bdg2">'+(pl<=3?'Balíček odměn':'Menší odměna')+'</span>':''})()+'</td></tr>'}).join("");
  h+=rest.slice(0,5).map(function(x){return '<tr><td class="rk">—</td><td class="nk">'+esc(x.nick)+'</td><td class="tm">'+(x.prog||'')+'</td><td><span class="wait">'+(ch?"Na trati":"Čeká na schválení")+'</span></td></tr>'}).join("");
  if(!ok.length&&!rest.length)h+='<tr><td colspan="4" class="empty">Zatím tu nikdo není. Buď první.</td></tr>';
  $("hr2-body").innerHTML=h+'</tbody></table>';
@@ -2629,7 +2639,7 @@ function rows(k){
  if(R[k].sample)return {ok:SAMPLE.map(function(x){return {nick:x[0],dist:x[1],time:x[2],date:x[3],key:secs(x[2])}}),rest:[]};
  var rs=S.regs.filter(function(r){return r.race===k&&r.paid}),ch=isCh(k);
  var ok=rs.filter(done);
- return {ok:ok.map(function(r){var x=res(r),s=ch?chKm(r):0;return ch?(function(){var ct=chTime(r);return {uid:r.userId,nick:nick(r),dist:r.dist,time:ct!=null?fmtT(ct):kmf(s)+" km",date:"",key:ct!=null?ct:1e12-s}})():{uid:r.userId,nick:nick(r),dist:r.dist,time:x.time,date:x.date,key:secs(x.time)}}),
+ return {ok:ok.map(function(r){var x=res(r),s=ch?chKm(r):0;return ch?(function(){var ct=chTime(r);return {uid:r.userId,nick:nick(r),dist:r.dist,time:ct!=null?fmtT(ct)+(s>r.dist+0.005?" · uběhnuto "+kmf(s)+" km":""):kmf(s)+" km",date:"",key:ct!=null?ct:1e12-s}})():{uid:r.userId,nick:nick(r),dist:r.dist,time:x.time,date:x.date,key:secs(x.time)}}),
          rest:rs.filter(function(r){return ok.indexOf(r)<0}).map(function(r){return {uid:r.userId,nick:nick(r),dist:r.dist,prog:ch?kmf(chKm(r))+" / "+r.dist+" km":""}})};
 }
 function norm(t){return String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
@@ -2819,7 +2829,7 @@ ef.addEventListener("submit",function(ev){
  ev.preventDefault();if(!me||me.role!=="admin")return;
  function fail(m){$("e-err").textContent=m;$("e-err").hidden=false}
  var n=$("e-n").value.trim(),f=$("e-f").value,e=$("e-e").value,up=$("e-up").value;
- var km=$("e-km").value.split(/[;,\s]+/).map(function(x){return parseFloat(x.replace(",","."))}).filter(function(x){return x>0});
+ var km=$("e-km").value.split(/[;,\s]+/).map(function(x){return parseFloat(x.replace(",","."))}).filter(function(x){return x>0});if(ef.ekind.value==="challenge")km=km.slice(0,1);
  km=km.filter(function(x,i){return km.indexOf(x)===i}).sort(function(a,b){return a-b});
  if(!n)return fail("Zadej název.");
  if(!f||!e)return fail("Zadej datum začátku i konce.");
