@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+  command = ""
+
+[[headers]]
+  for = "/ocr/*.gz"
+  [headers.values]
+    Content-Type = "application/gzip"

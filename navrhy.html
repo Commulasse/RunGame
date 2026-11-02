@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RunGame – návrhy webu</title>
+<style>html,body{height:100%;margin:0}body{display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#111}
+iframe{flex:1;border:0;width:100%;background:#fff}.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding:10px 12px;background:#111;color:#fff;border-top:1px solid #333}
+.bar span{font-size:14px;opacity:.7}button{font:inherit;font-size:14px;font-weight:700;padding:9px 16px;border-radius:999px;border:2px solid #555;background:transparent;color:#fff;cursor:pointer}
+button[aria-pressed="true"]{background:#ff6a13;border-color:#ff6a13;color:#111}.open{color:#fff;font-size:14px}</style></head>
+<body><iframe id="f" title="Náhled varianty" src="varianta-1.html"></iframe>
+<div class="bar"><span>Návrh:</span><button data-v="1">1 · Barevná</button><button data-v="2">2 · Moderní</button><button data-v="3">3 · Tmavá závodní (hlavní web)</button><a class="open" id="o" href="varianta-1.html" target="_blank" rel="noopener">Otevřít samostatně</a></div>
+<script>var F={1:"varianta-1.html",2:"varianta-2.html",3:"index.html"},f=document.getElementById("f"),o=document.getElementById("o"),bs=document.querySelectorAll("button");
+function show(v,load){if(!F[v])v="1";if(load)f.src=F[v];o.href=F[v];bs.forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v===v)});try{history.replaceState(null,"","#"+v)}catch(e){}}
+bs.forEach(function(b){b.addEventListener("click",function(){show(b.dataset.v,true)})});var h=location.hash.slice(1);show(h,h&&h!=="1");</script></body></html>

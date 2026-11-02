@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>RunGame 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: mozaika zaoblených dlaždic; noční hlavní dlaždice s ovály dráhy, vedle ní bota a medaile v barvách úsvitu. */
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --fg:#10131c; --muted:#5c6475; --line:#dbe0e9;
+  --night:#10131c; --night2:#1d2333; --on-night:#f4f6fa; --on-night-muted:#aab2c5;
+  --a1:#ff7a2f; --a2:#ff2e7e; --gold:#f5b93a; --gold2:#c98612; --silver:#cfd6e2; --silver2:#8b95a8;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:28px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0a0c12; --surface:#151923; --fg:#f4f6fa; --muted:#9aa3b5; --line:#262c3a; --night:#1a1f2c; --night2:#272e41; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0a0c12; --surface:#151923; --fg:#f4f6fa; --muted:#9aa3b5; --line:#262c3a; --night:#1a1f2c; --night2:#272e41; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16.5px;line-height:1.6}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:16px;padding-block:16px 40px;display:flex;flex-direction:column;gap:88px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.02;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:clamp(2rem,4.6vw,3.3rem);font-weight:800}
+h3{font-size:1.25rem;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit}
+.grad{background:linear-gradient(100deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);max-width:58ch;margin-top:12px;font-size:1.05rem}
+.btn{display:inline-flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;padding:14px 24px;border-radius:999px;
+  background:linear-gradient(100deg,var(--a1),var(--a2));color:var(--night);transition:transform .15s,filter .15s}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.btn.line{background:none;color:inherit;box-shadow:inset 0 0 0 2px currentColor}
+.btn:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--a1);outline-offset:3px}
+.chip{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:var(--night2);color:var(--on-night)}
+
+nav{display:flex;flex-wrap:wrap;align-items:center;gap:8px 26px;padding:10px 6px}
+.logo{font-family:var(--display);font-weight:800;font-size:1.3rem;text-decoration:none;margin-right:auto;letter-spacing:-.03em}
+nav a.l{text-decoration:none;font-weight:500;color:var(--muted)}
+nav a.l:hover{color:var(--fg)}
+
+/* hero bento */
+.hero{display:grid;grid-template-columns:1.55fr 1fr;grid-template-rows:auto auto;gap:16px;margin-top:-72px}
+.hero{margin-top:calc(16px - 88px)}
+.hero>*{min-width:0;border-radius:var(--r);overflow:hidden;position:relative}
+.main{grid-row:1/3;background:var(--night);color:var(--on-night);padding:clamp(28px,5vw,60px);display:flex;flex-direction:column;gap:22px;justify-content:flex-end;min-height:480px}
+.main h1{font-size:clamp(2.8rem,7.4vw,5.6rem);font-weight:800}
+.main p{color:var(--on-night-muted);max-width:44ch;font-size:1.1rem}
+.main .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.track{position:absolute;right:-140px;top:-120px;width:560px;height:420px;opacity:.5;pointer-events:none}
+.main>*:not(.track){position:relative}
+.shoe{background:linear-gradient(135deg,var(--a1),var(--a2));display:grid;place-items:center;padding:20px;min-height:230px}
+.shoe svg{width:100%;max-width:340px;height:auto;animation:stride 2.6s ease-in-out infinite alternate}
+@keyframes stride{from{transform:translateX(-6px) rotate(-4deg)}to{transform:translateX(8px) rotate(-9deg)}}
+.prize{background:var(--surface);padding:22px;display:flex;align-items:center;gap:18px}
+.prize svg{width:96px;height:auto;flex:none}
+.prize b{font-family:var(--display);font-size:1.3rem;display:block;line-height:1.1}
+.prize span{color:var(--muted);font-size:.95rem}
+
+/* steps as a lane */
+.lane{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:0;counter-reset:s;position:relative}
+.lane::before{content:"";position:absolute;left:0;right:0;top:21px;border-top:3px dashed var(--line)}
+.lane li{counter-increment:s;padding-right:22px;position:relative;min-width:0}
+.lane li::before{content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--night);color:var(--on-night);
+  font-family:var(--display);font-weight:800;margin-bottom:16px;position:relative}
+.lane li:last-child::before{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--night)}
+.lane p{color:var(--muted);font-size:.95rem;margin-top:6px}
+
+/* races */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+.race{background:var(--surface);border-radius:var(--r);padding:22px;display:flex;flex-direction:column;gap:8px;min-width:0;transition:transform .2s}
+.race:hover{transform:translateY(-6px)}
+.race svg{width:92px;height:auto;margin-bottom:8px}
+.race .d{font-weight:700;font-variant-numeric:tabular-nums}
+.race .m{color:var(--muted);font-size:.93rem}
+.race a{margin-top:auto;padding-top:14px;font-weight:700;text-decoration:none}
+.race a::after{content:" →"}
+.next{color:var(--muted);margin-top:22px;max-width:80ch}
+
+/* year-round */
+.year{background:var(--night);color:var(--on-night);border-radius:var(--r);padding:clamp(24px,5vw,56px)}
+.year .sub{color:var(--on-night-muted)}
+.rows{margin-top:30px;display:grid}
+.row{display:grid;grid-template-columns:1.1fr 2fr auto;gap:8px 24px;align-items:baseline;padding-block:18px;border-top:1px solid var(--night2)}
+.row>*{min-width:0}
+.row p{color:var(--on-night-muted)}
+.row b{font-family:var(--display);font-size:1.1rem;white-space:nowrap}
+
+/* packs */
+.packs{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px}
+.pack{background:var(--surface);border-radius:var(--r);padding:26px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.pack.best{background:var(--night);color:var(--on-night)}
+.pack .p{font-family:var(--display);font-weight:800;font-size:2.4rem;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.pack ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:.96rem}
+.pack li{padding-left:22px;position:relative}
+.pack li::before{content:"";position:absolute;left:0;top:.5em;width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--a1),var(--a2))}
+.pack .chip{align-self:flex-start;background:linear-gradient(100deg,var(--a1),var(--a2));color:var(--night)}
+
+.team{background:var(--surface);border-radius:var(--r);padding:clamp(24px,4vw,44px);display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
+.team div{flex:1 1 420px;min-width:0}
+
+.faq{display:grid;gap:10px;margin-top:30px;max-width:840px}
+details{background:var(--surface);border-radius:20px;padding:0 22px}
+summary{cursor:pointer;font-weight:700;padding-block:18px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::after{content:"+";font-family:var(--display);font-size:1.3rem;line-height:1;color:var(--a2)}
+details[open] summary::after{content:"–"}
+details p{padding-bottom:20px;color:var(--muted);max-width:65ch}
+
+.final{border-radius:var(--r);background:linear-gradient(120deg,var(--a1),var(--a2));color:var(--night);padding:clamp(32px,7vw,80px);text-align:center}
+.final h2{font-size:clamp(2.2rem,6.5vw,4.6rem)}
+.final .btn{background:var(--night);color:var(--on-night);margin-top:26px}
+footer{display:flex;flex-wrap:wrap;gap:8px 22px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:24px}
+footer .n{flex-basis:100%}
+
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr 1fr}.main{grid-column:1/3;grid-row:auto;min-height:400px}
+  .cards,.packs{grid-template-columns:repeat(2,1fr)}
+  .lane{grid-template-columns:1fr;gap:22px}.lane::before{left:21px;right:auto;top:0;bottom:0;border-top:0;border-left:3px dashed var(--line)}
+  .lane li{display:grid;grid-template-columns:44px 1fr;column-gap:16px;padding-right:0}.lane li::before{grid-row:1/3;margin:0}
+  .row{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .wrap{gap:64px}.hero{grid-template-columns:1fr;margin-top:-48px}.main{grid-column:auto}.cards,.packs{grid-template-columns:1fr}nav a.l{display:none}
+}
+@media (prefers-reduced-motion:reduce){.shoe svg{animation:none}.btn,.race{transition:none}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="rb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff7a2f"/><stop offset="1" stop-color="#ff2e7e"/></linearGradient>
+    <symbol id="medal" viewBox="0 0 100 130">
+      <path d="M22 0h22l14 46H36z" fill="url(#rb)"/>
+      <path d="M78 0H56L42 46h22z" fill="var(--rib,#10131c)"/>
+      <circle cx="50" cy="84" r="42" fill="var(--m2)"/>
+      <circle cx="50" cy="84" r="34" fill="var(--m1)"/>
+      <circle cx="50" cy="84" r="26" fill="none" stroke="var(--m2)" stroke-width="2" stroke-dasharray="3 5"/>
+      <path d="M50 66l5.3 11 12 1.6-8.8 8.3 2.2 11.9L50 93l-10.7 5.8 2.2-11.9-8.8-8.3 12-1.6z" fill="var(--m2)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+<nav>
+  <a class="logo" href="#top">run<span class="grad">game</span></a>
+  <a class="l" href="#zavody">Závody</a>
+  <a class="l" href="#vyzvy">Celoroční výzvy</a>
+  <a class="l" href="#balicky">Balíčky</a>
+  <a class="l" href="#otazky">Otázky</a>
+  <a class="btn" href="#zavody" style="padding:10px 18px">Chci běžet</a>
+</nav>
+
+<header class="hero" id="top">
+  <div class="main">
+    <svg class="track" viewBox="0 0 560 420" fill="none" aria-hidden="true">
+      <rect x="20" y="20" width="520" height="380" rx="190" stroke="url(#rb)" stroke-width="3"/>
+      <rect x="60" y="60" width="440" height="300" rx="150" stroke="#f4f6fa" stroke-opacity=".35" stroke-width="2"/>
+      <rect x="100" y="100" width="360" height="220" rx="110" stroke="#f4f6fa" stroke-opacity=".25" stroke-width="2"/>
+      <rect x="140" y="140" width="280" height="140" rx="70" stroke="#f4f6fa" stroke-opacity=".15" stroke-width="2"/>
+    </svg>
+    <span class="chip" style="align-self:flex-start">Virtuální závody · 5, 10, 21 km</span>
+    <h1>Start máš <span class="grad">před domem.</span></h1>
+    <p>Vyber si závod, zaběhni nebo ujdi ho kdekoliv a kdykoliv v daném termínu. Medaile ti přijde až domů.</p>
+    <div class="cta">
+      <a class="btn" href="#zavody">Vybrat závod</a>
+      <a class="btn line" href="#jak">Jak to funguje</a>
+    </div>
+  </div>
+
+  <div class="shoe">
+    <svg viewBox="0 0 340 190" fill="none" aria-hidden="true">
+      <path d="M6 70h46M0 96h38M10 122h30" stroke="#fff" stroke-opacity=".7" stroke-width="5" stroke-linecap="round"/>
+      <path d="M60 128l6-58c2-14 14-18 24-10 20 22 44 26 66 14l34-30c9-8 20-7 28 2l38 42c22 12 46 18 66 22 12 3 16 10 14 18z" fill="#10131c"/>
+      <path d="M190 46l26 30M176 58l26 30M162 70l24 28" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+      <path d="M92 118l40-34M118 122l40-34M144 126l34-28" stroke="#f5b93a" stroke-width="7" stroke-linecap="round"/>
+      <path d="M56 128h280c2 16-6 28-24 28H76c-16 0-22-12-20-28z" fill="#fff"/>
+      <path d="M70 142h252" stroke="#10131c" stroke-opacity=".25" stroke-width="3" stroke-dasharray="10 8" stroke-linecap="round"/>
+      <path d="M66 70c-6-8-2-20 8-22" stroke="#10131c" stroke-width="7" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="prize">
+    <svg viewBox="0 0 100 130" style="--m1:var(--gold);--m2:var(--gold2);--rib:var(--fg)" aria-hidden="true"><use href="#medal"/></svg>
+    <div><b>Litá medaile ke každému závodu</b><span>Pokaždé jiný motiv. Sbírka, která roste s tebou.</span></div>
+  </div>
+</header>
+
+<section id="jak">
+  <h2>Pět kroků <span class="grad">k medaili</span></h2>
+  <ol class="lane">
+    <li><h3>Vyber si závod</h3><p>Sváteční běh, nebo celoroční výzvu. Tratě od 5 km.</p></li>
+    <li><h3>Zvol balíček</h3><p>Od digitálního diplomu po medaili s tričkem.</p></li>
+    <li><h3>Vyraz po svém</h3><p>Trasu, čas i tempo si určuješ sám. Běh, klus i chůze se počítají.</p></li>
+    <li><h3>Nahraj výsledek</h3><p>Stačí čas a screenshot z hodinek nebo aplikace.</p></li>
+    <li><h3>Vyzvedni si odměnu</h3><p>Diplom máš hned, medaile dorazí poštou.</p></li>
+  </ol>
+</section>
+
+<section id="zavody">
+  <h2>Kam vyběhneš příště?</h2>
+  <p class="sub">Každý závod má okno několika dní. Když prší, jdeš zítra.</p>
+  <div class="cards">
+    <article class="race">
+      <svg viewBox="0 0 100 130" style="--m1:var(--gold);--m2:var(--gold2);--rib:var(--fg)" aria-hidden="true"><use href="#medal"/></svg>
+      <h3>Běh svobody</h3><p class="d">14.–17. 11. 2026</p><p class="m">5 · 10 · 21 km<br>Motiv: trikolóra a klíče</p><a href="#balicky">Od 349 Kč</a>
+    </article>
+    <article class="race">
+      <svg viewBox="0 0 100 130" style="--m1:var(--silver);--m2:var(--silver2);--rib:var(--fg)" aria-hidden="true"><use href="#medal"/></svg>
+      <h3>Mikulášský běh</h3><p class="d">4.–6. 12. 2026</p><p class="m">5 · 10 km<br>Motiv: čert, anděl, Mikuláš</p><a href="#balicky">Od 349 Kč</a>
+    </article>
+    <article class="race">
+      <svg viewBox="0 0 100 130" style="--m1:var(--a1);--m2:var(--gold2);--rib:var(--fg)" aria-hidden="true"><use href="#medal"/></svg>
+      <h3>Vánoční běh</h3><p class="d">20.–26. 12. 2026</p><p class="m">5 · 10 km<br>Motiv: kapr a stromek</p><a href="#balicky">Od 349 Kč</a>
+    </article>
+    <article class="race">
+      <svg viewBox="0 0 100 130" style="--m1:var(--gold);--m2:var(--a2);--rib:var(--fg)" aria-hidden="true"><use href="#medal"/></svg>
+      <h3>Silvestrovský běh</h3><p class="d">28.–31. 12. 2026</p><p class="m">5 · 10 · 21 km<br>Motiv: půlnoční hodiny</p><a href="#balicky">Od 349 Kč</a>
+    </article>
+  </div>
+  <p class="next">V roce 2027 navazují Novoroční restart, Valentýnský běh, Běh pro ni, Zelený běh, Velikonoční běh, Čarodějnický běh, Běh pro mámu, Rodinná míle, Slunovratový běh, Svatováclavský běh, Běh republiky a Halloweenský běh.</p>
+</section>
+
+<section class="year" id="vyzvy">
+  <h2>Jeden závod <span class="grad">ti nestačí?</span></h2>
+  <p class="sub">Sbírej kilometry celý rok, plň měsíční cíle nebo projdi Česko krok za krokem. Každý zapsaný kilometr se počítá.</p>
+  <div class="rows">
+    <div class="row"><h3>Rok v pohybu</h3><p>Od 1. 1. do 31. 12. sbíráš kilometry. Cíl si volíš: 500, 1 000 nebo 2 027 km.</p><b>890 Kč</b></div>
+    <div class="row"><h3>Měsíční výzva</h3><p>Každý měsíc nový cíl 50 nebo 100 km. Za 12 splněných měsíců medaile.</p><b>149 Kč měsíčně</b></div>
+    <div class="row"><h3>Čtyři období</h3><p>Jaro, léto, podzim, zima. Čtyři medaile, které do sebe zapadají.</p><b>1 990 Kč za sérii</b></div>
+    <div class="row"><h3>30 dní v řadě</h3><p>Třicet dní po sobě aspoň 1 km. Začít můžeš kdykoliv.</p><b>590 Kč</b></div>
+    <div class="row"><h3>Virtuální trasa</h3><p>Kilometry tě posouvají po mapě přes celé Česko. Z míst na trase ti chodí pohlednice.</p><b>690 Kč</b></div>
+    <div class="row"><h3>Firemní liga</h3><p>Týmy sčítají kilometry, mají vlastní žebříček a měsíční vyhodnocení.</p><b>Na míru</b></div>
+  </div>
+</section>
+
+<section id="balicky">
+  <h2>Vyber si, co si odneseš</h2>
+  <p class="sub">Všechny ceny jsou konečné, včetně DPH a dopravy.</p>
+  <div class="packs">
+    <div class="pack"><h3>Digital</h3><p class="p">349 Kč</p><ul><li>Start v závodě</li><li>Startovní číslo k vytištění</li><li>Místo ve výsledcích</li><li>Jmenný diplom v PDF</li><li>Digitální odznak</li></ul></div>
+    <div class="pack best"><span class="chip">Nejčastější volba</span><h3>Medaile</h3><p class="p">590 Kč</p><ul><li>Vše z balíčku Digital</li><li>Litá medaile poštou</li></ul></div>
+    <div class="pack"><h3>Plus</h3><p class="p">690 Kč</p><ul><li>Vše z balíčku Medaile</li><li>Nákrčník, nebo čelenka</li></ul></div>
+    <div class="pack"><h3>Komplet</h3><p class="p">950 Kč</p><ul><li>Vše z balíčku Medaile</li><li>Nákrčník</li><li>Čelenka</li><li>Běžecké tričko</li></ul></div>
+  </div>
+</section>
+
+<section class="team">
+  <div><h3 style="font-size:1.8rem">Běžte spolu, i když každý jinde</h3><p class="sub">Založ tým, pozvi kolegy nebo kamarády a sledujte společný žebříček. Pro firmy připravíme závod na míru.</p></div>
+  <a class="btn" href="#otazky">Napsat si o nabídku</a>
+</section>
+
+<section id="otazky">
+  <h2>Časté otázky</h2>
+  <div class="faq">
+    <details open><summary>Co je to virtuální závod?</summary><p>Závod, který běžíš sám, na své trase a ve svém čase. Výsledek nahraješ do účtu a zařadíš se do společné výsledkové listiny.</p></details>
+    <details><summary>Musím běžet, nebo můžu jít?</summary><p>Můžeš běžet, klusat, jít i chodit s holemi. Počítá se i běžecký pás. Kolo, koloběžka a brusle se nepočítají.</p></details>
+    <details><summary>Jak prokážu výsledek?</summary><p>Screenshotem z aplikace nebo hodinek, případně fotkou displeje pásu. Musí být vidět datum, vzdálenost a čas.</p></details>
+    <details><summary>Kdy dostanu medaili?</summary><p>Odesíláme do 14 dnů od schválení výsledku. Sledovací číslo ti přijde e-mailem.</p></details>
+    <details><summary>Co když závod nestihnu?</summary><p>Startovné se nevrací, ale registraci ti na požádání jednou převedeme na jiný závod.</p></details>
+    <details><summary>Můžu registraci darovat?</summary><p>Ano. Při registraci vyplň jméno a e-mail obdarovaného, nebo si kup dárkový poukaz.</p></details>
+  </div>
+</section>
+
+<section class="final">
+  <h2>Boty máš.<br>Důvod teď taky.</h2>
+  <a class="btn" href="#zavody">Vybrat závod</a>
+</section>
+
+<footer>
+  <span>Závody</span><span>Celoroční výzvy</span><span>Výsledky</span><span>Pravidla</span><span>Obchodní podmínky</span><span>Ochrana osobních údajů</span><span>Kontakt</span>
+  <span class="n">Návrh úvodní stránky. Registrace a platby zatím nejsou zapojené, ceny a termíny jsou pracovní.</span>
+</footer>
+</div>
+</body>
+</html>
