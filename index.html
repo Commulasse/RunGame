@@ -1369,7 +1369,7 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
   <h2>Otázky</h2>
   <div class="faq2">
     <details><summary>Kdo získá odměnu?</summary><p>Prvních 10 závodníků v každém dlouhém závodě podle nasbíraných km. První tři dostanou balíčky suplementů, 4. až 10. místo věcnou odměnu. Adresu si od nich vyžádáme po uzávěrce nahrávání. Krátké závody jsou bez odměn.</p></details>
-    <details><summary>Co dostanu za startovné?</summary><p>Startovní číslo předem do e-mailu, deník běhů, místo ve výsledcích a po splnění závodu personalizovaný diplom se jménem, tratí a časem.</p></details>
+    <details><summary>Co dostanu za startovné?</summary><p>Krátký závod stojí 249 Kč, dlouhý vícedenní závod 349 Kč. Za startovné máš startovní číslo předem do e-mailu, deník běhů, místo ve výsledcích a po splnění závodu personalizovaný diplom se jménem, tratí a časem.</p></details>
     <details><summary>Kontrolujete nahrané běhy?</summary><p>Ano, každý nahraný běh ručně kontrolujeme. Když údaje nesedí se screenem nebo souborem, běh ti vrátíme k doplnění s poznámkou.</p></details>
     <details><summary>Můžu místo běhu jít?</summary><p>Jasně. Běh, klus i chůze se počítají, tempo je na tobě. Počítá se i běžecký pás, kolo, koloběžka a brusle ne.</p></details>
     <details><summary>Jak nahraju výsledek?</summary><p>V deníku vložíš screenshot z aplikace nebo hodinek, případně soubor FIT, GPX či TCX. Datum, vzdálenost a čas přečteme za tebe.</p></details>
@@ -2042,6 +2042,7 @@ fillSelects();
 function opt(name,val,title,sub,price,checked){
  return '<label class="opt"><input type="radio" name="'+name+'" id="'+name+'-'+val+'" value="'+val+'"'+(checked?" checked":"")+'><span><b>'+title+'</b>'+(sub?'<em>'+sub+'</em>':'')+(price?'<strong>'+price+'</strong>':'')+'</span></label>';
 }
+function fee(k){return isCh(k)?349:249}
 function prizeOk(k){return !!(R[k]&&isCh(k))}
 function prizeList(k){return S.regs.filter(function(r){return r.race===k&&r.paid}).map(function(r){return {r:r,km:chKm(r)}}).filter(function(x){return x.km>0}).sort(function(a,b){return b.km-a.km})}
 function prizePlace(k,uid){var l=prizeList(k);for(var i=0;i<l.length&&i<10;i++)if(l[i].r.userId===uid)return i+1;return 0}
@@ -2072,7 +2073,7 @@ function sync(){
  var pz=prizeOk(cur);
  $("s-top3").innerHTML=pz?'<b>TOP10</b><span>Běžíš o věcné odměny. Prvních 10 podle nasbíraných km získá odměnu, první tři balíčky suplementů.</span>':'<b>Bez odměn</b><span>Krátký závod se běží pro sebe a do výsledků. O ceny se běží v dlouhých závodech.</span>';
  $("s-top3").className="t3s"+(pz?" yes":"");
- var pn=$("r-przn");pn.hidden=false;pn.className="przn"+(pz?" yes":"");pn.innerHTML=pz?'<b>Tenhle závod se běží o věcné odměny.</b> Prvních 10 podle nasbíraných km dostane odměnu, první tři balíčky suplementů.':'Krátké závody jsou bez odměn. O ceny se běží v dlouhých závodech (víc než 3 dny, km se sčítají).';$("s-pay").textContent=PAY[pay];$("s-tot").textContent=money(P[pack].p);
+ var pn=$("r-przn");pn.hidden=false;pn.className="przn"+(pz?" yes":"");pn.innerHTML=pz?'<b>Tenhle závod se běží o věcné odměny.</b> Prvních 10 podle nasbíraných km dostane odměnu, první tři balíčky suplementů.':'Krátké závody jsou bez odměn. O ceny se běží v dlouhých závodech (víc než 3 dny, km se sčítají).';$("s-pay").textContent=PAY[pay];$("s-tot").textContent=money(fee(cur));
 }
 form.addEventListener("change",function(e){
  var t=e.target;
@@ -2091,7 +2092,7 @@ form.addEventListener("submit",function(e){
  var extra=pack==="plus"?form.extra.value.toLowerCase():pack==="komplet"?"tričko "+$("r-size").value+", "+$("r-cut").value.toLowerCase():"";
  var nk=$("r-nick").value.trim();me.nick=nk;
  S.seq++;
- var r={id:"r"+S.seq,bib:S.seq,at:today(),nick:nk,userId:me.id,race:cur,dist:dist,pack:pack,extra:extra,price:P[pack].p,pay:pay,paid:pay!=="bank"};
+ var r={id:"r"+S.seq,bib:S.seq,at:today(),nick:nk,userId:me.id,race:cur,dist:dist,pack:pack,extra:extra,price:fee(cur),pay:pay,paid:pay!=="bank"};
  S.regs.push(r);save();
  var txt=nk+", jsi přihlášen(a) na "+R[cur].n+" ("+R[cur].d+"), trať "+dist+" km, balíček "+P[pack].n+(extra?" ("+extra+")":"")+" za "+money(r.price)+". Tvoje startovní číslo je "+r.bib+", posíláme ti ho i e-mailem. Po splnění závodu dostaneš personalizovaný diplom. ";
  txt+=r.paid?"Platba proběhla ("+PAY[pay]+"). Výsledek nahraj ve svém účtu do "+R[cur].u+".":"Registrace začne platit po připsání platby. Pošli "+money(r.price)+" s variabilním symbolem "+r.bib+". Číslo účtu a QR kód přijdou e-mailem.";
