@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <meta name="theme-color" content="#0c0a12">
-<meta name="description" content="Virtuální běžecké závody. Vyber si závod, zaběhni ho kdekoliv a medaile ti přijde domů.">
+<meta name="description" content="Virtuální běžecké závody. Vyber si závod, zaběhni ho kdekoliv a výsledek nahraj online. V dlouhých závodech běžíš o věcné odměny.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -1316,6 +1316,22 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
 .evrw{position:absolute;left:0;right:0;top:0;aspect-ratio:16/10;display:grid;place-items:center;z-index:2;pointer-events:none}
 .evreg{background:var(--c);color:#0c0a12;font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px 10px 14px;clip-path:polygon(0 0,100% 0,calc(100% - 9px) 100%,0 100%);filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))}
 .slot.evs.add:hover .evi{filter:grayscale(.3) brightness(.7)}
+
+/* ostrý provoz */
+html.live [data-demo]{display:none!important}
+html:not(.live) [data-live]{display:none!important}
+.qrpay{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;margin-top:14px;padding:16px;background:#15121f;border:1px solid #2a2636;border-left:3px solid var(--lime)}
+.qrpay img{background:#fff;padding:8px;width:180px;height:180px;image-rendering:pixelated}
+.qrpay dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:8px 0;font-size:.95rem}
+.qrpay dt{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;color:var(--muted);align-self:center}
+.qrpay>div{flex:1 1 220px;min-width:0}
+.csvimp{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0}
+.csvimp label.btn{cursor:pointer}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99;max-width:min(560px,calc(100vw - 32px));background:#15121f;color:#fff;border-left:3px solid var(--lime);padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:.92rem}
+#toast.bad{border-left-color:var(--red,#ff5470)}
+#toast[hidden]{display:none}
+.linkbtn{background:none;border:0;padding:0;color:var(--lime);text-decoration:underline;cursor:pointer;font:inherit}
+#lf[hidden],#pf[hidden],#npf[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -1468,7 +1484,7 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
         <div class="fields">
           <label for="r-mail">E-mail<input id="r-mail" name="mail" type="email" required autocomplete="email"></label>
           <label for="r-year">Rok narození<input id="r-year" name="year" type="number" min="1920" max="2008" required inputmode="numeric"></label>
-          <label class="full" for="r-pass" id="r-pass-l">Heslo k účtu závodníka (aspoň 6 znaků)<input id="r-pass" name="pass" type="password" minlength="6" autocomplete="new-password"></label>
+          <label class="full" for="r-pass" id="r-pass-l">Heslo k účtu závodníka (aspoň 8 znaků)<input id="r-pass" name="pass" type="password" minlength="8" autocomplete="new-password"></label>
           <label class="full" for="r-team">Tým (nepovinné)<input id="r-team" name="team"></label>
         </div>
       </fieldset>
@@ -1482,7 +1498,7 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
       </fieldset>
       <fieldset><legend>Souhlasy<i>.</i></legend>
         <div class="checks">
-          <label for="c1"><input type="checkbox" id="c1" required>Souhlasím s pravidly závodu a obchodními podmínkami.</label>
+          <label for="c1"><input type="checkbox" id="c1" required>Souhlasím s <a href="pravidla.html" target="_blank" rel="noopener">pravidly závodu</a> a <a href="podminky.html" target="_blank" rel="noopener">obchodními podmínkami</a>. Beru na vědomí <a href="gdpr.html" target="_blank" rel="noopener">zpracování osobních údajů</a>.</label>
           <label for="c2"><input type="checkbox" id="c2" required>Potvrzuji, že mi je 18 let a můj zdravotní stav mi účast dovoluje.</label>
           <label for="c3"><input type="checkbox" id="c3" required>Beru na vědomí, že moje přezdívka a výsledek budou ve veřejné výsledkové tabulce.</label>
           <label for="c4"><input type="checkbox" id="c4">Chci dostávat novinky o dalších závodech. (nepovinné)</label>
@@ -1506,7 +1522,8 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
   <div class="done" id="done" hidden tabindex="-1">
     <h2>Jsi v tom</h2>
     <p id="d-text"></p>
-    <p class="note">Ukázka: platba je simulovaná a e-mail se neodesílá.</p>
+    <div id="d-pay"></div>
+    <p class="note" data-demo>Ukázka: platba je simulovaná a e-mail se neodesílá.</p>
     <a class="btn" href="#ucet" data-view="auth" style="justify-self:start">Přejít do účtu závodníka</a>
   </div>
 </div></section>
@@ -1540,8 +1557,22 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
       </div>
       <p class="err" id="l-err" hidden></p>
       <button class="btn" type="submit" style="justify-self:start">Přihlásit se</button>
+      <p class="note"><button type="button" class="linkbtn" id="l-forgot">Zapomenuté heslo?</button></p>
     </form>
-    <div class="panel">
+    <form id="pf" class="panel" hidden>
+      <h3>Zapomenuté heslo</h3>
+      <p class="note">Pošleme ti e-mail s odkazem, přes který si nastavíš nové heslo.</p>
+      <div class="fields"><label class="full" for="pf-mail">E-mail<input id="pf-mail" type="email" required autocomplete="username"></label></div>
+      <p class="err" id="pf-err" hidden></p><p class="note okmsg" id="pf-ok" hidden></p>
+      <button class="btn" type="submit" style="justify-self:start">Poslat odkaz</button>
+    </form>
+    <form id="npf" class="panel" hidden>
+      <h3>Nové heslo</h3>
+      <div class="fields"><label class="full" for="np-pass">Nové heslo (aspoň 8 znaků)<input id="np-pass" type="password" minlength="8" required autocomplete="new-password"></label></div>
+      <p class="err" id="np-err" hidden></p>
+      <button class="btn" type="submit" style="justify-self:start">Uložit heslo</button>
+    </form>
+    <div class="panel" data-demo>
       <h3>Testovací účty</h3>
       <p class="note">Jen pro ukázku. Na ostrém webu tento panel nebude.</p>
       <div class="acct"><div><b>Administrátor</b><br><code>admin@rungame.cz / admin123</code></div><button class="btn g" type="button" data-fill="admin@rungame.cz|admin123">Vyplnit</button></div>
@@ -1607,8 +1638,10 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
     <div class="sec"><h3>Závody</h3><div class="aevs" id="adm-evs"></div></div>
     <div class="sec"><h3>Platby převodem</h3>
       <p class="note" style="margin-top:8px">Platby převodem (QR) párujte podle variabilního symbolu. Omylem potvrzenou platbu vrátíte tlačítkem Zrušit platbu.</p>
+      <div class="csvimp"><label class="btn g" for="csv-in">Nahrát výpis z banky (CSV)<input type="file" id="csv-in" accept=".csv,.txt,text/csv" class="vh"></label><span class="note" id="csv-msg">Stáhni výpis pohybů z internetového bankovnictví jako CSV. Web najde platby podle variabilního symbolu a částky a označí je jako zaplacené.</span></div>
       <div class="tw"><table><thead><tr><th>Variabilní symbol</th><th>Závodník</th><th>Závod</th><th>Částka</th><th>Stav</th><th></th></tr></thead><tbody id="adm-pay"></tbody></table></div></div>
-    <div class="sec"><button class="btn g" type="button" data-act="reset">Obnovit testovací data</button> <span class="note">Smaže vše, co jsi v ukázce vytvořil, a vrátí výchozí účty a registrace.</span></div>
+    <div class="sec" data-live><h3>Úklid screenshotů</h3><p class="note" style="margin:8px 0 12px">Smaže screenshoty schválených a vrácených běhů 30 dní po uzávěrce nahrávání. Km, časy a výsledky zůstanou. Šetří místo v úložišti (zdarma je 1 GB).</p><button class="btn g" type="button" id="clean-btn">Smazat staré screenshoty</button> <span class="note" id="clean-msg"></span></div>
+    <div class="sec" data-demo><button class="btn g" type="button" data-act="reset">Obnovit testovací data</button> <span class="note">Smaže vše, co jsi v ukázce vytvořil, a vrátí výchozí účty a registrace.</span></div>
   </div>
   <div data-pane="acts" hidden>
     <div class="bulk" id="adm-bulk">
@@ -1700,8 +1733,8 @@ footer.ft2 .n{flex-basis:100%;font-size:.72rem;color:var(--muted)}
 <div id="lb" hidden tabindex="-1" role="dialog" aria-label="Zvětšený screenshot, kliknutím zavřeš"><img alt="Zvětšený screenshot"></div>
 <footer class="ft2">
   <img class="fl" src="img/logo.svg" alt="RunGame" width="836" height="418" loading="lazy">
-  <div class="fls"><a href="mailto:info@rungame.cz">info@rungame.cz</a><a href="#ucet" data-view="auth">Administrace</a><a href="#otazky">Pravidla</a><a href="#otazky">Obchodní podmínky</a><a href="#otazky">Ochrana osobních údajů</a><span>© 2026 RunGame</span></div>
-  <span class="n">Ukázková verze. Platby jsou simulované, ceny a termíny jsou pracovní.</span>
+  <div class="fls"><a href="mailto:info@rungame.cz">info@rungame.cz</a><a href="#ucet" data-view="auth">Administrace</a><a href="pravidla.html">Pravidla</a><a href="podminky.html">Obchodní podmínky</a><a href="gdpr.html">Ochrana osobních údajů</a><span>© 2026 RunGame</span></div>
+  <span class="n" data-demo>Ukázková verze. Platby jsou simulované, ceny a termíny jsou pracovní.</span>
 </footer>
 
 <script>
@@ -1908,6 +1941,9 @@ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",
 "Výzvy":"Challenges","Přidat závod":"Add race","Přidat výzvu":"Add challenge","Splnilo":"Completed","registrací":"registrations","splnilo":"completed","Sběrné výzvy: kilometry ze všech schválených běhů v termínu se sčítají.":"Cumulative challenges: kilometres from all approved runs in the period add up.","Jednorázové závody: splní se jedním během v termínu závodu.":"One-off races: completed with a single run in the race window.","Přehled registrací, plateb a běhů ke schválení. Závody a výzvy spravuješ ve vlastních záložkách.":"Overview of registrations, payments and runs awaiting approval. Races and challenges have their own tabs.","Listopadová stovka":"November Hundred","Zimní výzva":"Winter Challenge","Rok v pohybu 2027":"A Year in Motion 2027","Barva akce":"Event colour","Použije se pro záři na kartě bez vlastního pozadí a pro rámečky v registraci.":"Used for the card glow when there's no custom background, and for accents in registration.","Pozadí karty":"Card background","Vlastní obrázek pozadí (nepovinné)":"Custom background image (optional)","Odebrat pozadí":"Remove background","Ztmavení pozadí:":"Background dimming:","Výřez obrázku":"Image crop","Střed":"Centre","Vlevo":"Left","Vpravo":"Right","Nahoře":"Top","Dole":"Bottom","Obrázek medaile, nejlépe PNG s průhledným pozadím (nepovinné)":"Medal image, ideally a PNG with a transparent background (optional)","Odebrat medaili":"Remove medal","Velikost medaile:":"Medal size:","Písmo názvu":"Title font","Kurzíva":"Italic","Velká písmena":"Uppercase","Náhled karty na webu":"Card preview","Náhled se mění hned při úpravách. Na web se dostane až po kliknutí na Uložit.":"The preview updates as you edit. It goes live only after you click Save.","Termín závodu":"Race dates","Název závodu":"Race name","Náhled pozadí":"Background preview","Náhled medaile":"Medal preview","Levandulová":"Lavender","Fialová":"Violet"
 };for(var k in a)RG.add(k,a[k])})();
 </script>
+<script src="config.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="vendor/load-supabase.js"></script>
 <script>
 (function(){
 var SAMPLE=[["Vítr z hor",21,"1:38:52","2026-09-13"],["Martin_MT",21,"1:51:07","2026-09-12"],["Běžící babička",21,"2:24:40","2026-09-14"],
@@ -1954,10 +1990,12 @@ function seed(){return demoRunners({seq:1007,aseq:6,session:null,
        {id:"r1005",bib:1005,userId:"tomas",race:"test",dist:10,pack:"plus",extra:"čelenka",price:690,pay:"card",paid:true,actId:"a3",otime:official(10.4,"0:58:03",10)},
        {id:"r1006",bib:1006,at:"2026-10-01",userId:"petr",race:"rijen",dist:25,pack:"medaile",extra:"",price:590,pay:"card",paid:true},
        {id:"r1007",bib:1007,at:"2026-10-05",userId:"jana",race:"rijen",dist:25,pack:"digital",extra:"",price:349,pay:"card",paid:true}]});}
+var CFG=window.RG_CFG||{},LIVE=!!(CFG.supabaseUrl&&CFG.supabaseKey&&window.supabase);
 var S=null,me=null,R={},RK=[];
-try{var j=localStorage.getItem(KEY);if(j)S=JSON.parse(j)}catch(e){}
-if(!S||!S.users||!S.regs||!S.events||!S.acts)S=seed();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}}
+if(LIVE)S={users:[],events:[],regs:[],acts:[],seq:0,aseq:0,session:null};
+else{try{var j=localStorage.getItem(KEY);if(j)S=JSON.parse(j)}catch(e){}
+if(!S||!S.users||!S.regs||!S.events||!S.acts)S=seed();}
+function save(){if(LIVE){DB.sync();return true}try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}}
 function user(id){for(var i=0;i<S.users.length;i++)if(S.users[i].id===id)return S.users[i];return null}
 function regById(id){for(var i=0;i<S.regs.length;i++)if(S.regs[i].id===id)return S.regs[i];return null}
 function actById(id){for(var i=0;i<S.acts.length;i++)if(S.acts[i].id===id)return S.acts[i];return null}
@@ -2088,7 +2126,7 @@ function prizeList(k,dist){return S.regs.filter(function(r){return r.race===k&&r
 function prizePlace(k,uid,dist){var l=prizeList(k,dist);for(var i=0;i<l.length&&i<10;i++)if(l[i].r.userId===uid)return i+1;return 0}
 function kmSub(k,ch){return ch?"Cíl za celé období":k===21?"Půlmaraton":k<=2?"Na zkoušku":k<=5?"Na rozběhnutí":k<=10?"Zlatý střed":"Pořádná porce"}
 function renderReg(){
- var r=R[cur],ch=isCh(cur);if(!r)return;reg.style.setProperty("--c",r.c);
+ var r=R[cur];if(!r)return;var ch=isCh(cur);reg.style.setProperty("--c",r.c);
  if(r.km.indexOf(dist)<0)dist=r.km[Math.min(1,r.km.length-1)];
  $("r-name").textContent=r.n;$("r-name").setAttribute("style",fontCss(r));var rh=document.querySelector(".rhead");rh.classList.remove("hasbg");rh.removeAttribute("style");$("r-date").textContent=r.d;$("r-up").textContent=r.u;
  $("r-kml").textContent=ch?"Cíle (km celkem)":"Tratě";document.querySelector(".rhead .lab").textContent="Registrace do závodu";var bk=document.querySelector("#reg .back");bk.textContent="← Zpět na závody";bk.setAttribute("href","#zavody");$("r-distl").textContent=ch?"Kolik chceš nasbírat":"Kolik toho dáš";
@@ -2125,6 +2163,16 @@ form.addEventListener("change",function(e){
 form.addEventListener("submit",function(e){
  e.preventDefault();
  var mail=$("r-mail").value.trim().toLowerCase(),name=($("r-fn").value.trim()+" "+$("r-ln").value.trim()).trim();
+ $("r-err").hidden=true;
+ if(LIVE){
+  var sbtn=form.querySelector('button[type=submit]'),nk0=$("r-nick").value.trim(),rc=R[cur];sbtn.disabled=true;
+  DB.register({mail:mail,pass:$("r-pass").value,name:name,nick:nk0,year:+$("r-year").value||null,team:$("r-team").value.trim(),news:$("c4").checked,race:cur,dist:dist}).then(function(res){
+   if(res.confirm){$("d-text").textContent="Účet je založený. Poslali jsme ti e-mail s odkazem pro potvrzení. Po kliknutí na odkaz se ti registrace do závodu "+rc.n+" uloží a dostaneš startovní číslo.";$("d-pay").innerHTML=""}
+   else{var r=res.reg;$("d-text").textContent=nk0+", jsi přihlášen(a) na "+rc.n+" ("+rc.d+"), trať "+r.dist+" km. Tvoje startovní číslo je "+r.bib+", posíláme ti ho i e-mailem. Registrace začne platit po připsání platby. Po splnění závodu dostaneš personalizovaný diplom.";$("d-pay").innerHTML=payBox(r)}
+   form.hidden=true;$("done").hidden=false;window.scrollTo(0,0);$("done").focus();DB.refresh();
+  }).catch(function(err){$("r-err").textContent=DB.msg(err);$("r-err").hidden=false}).finally(function(){sbtn.disabled=false});
+  return;
+ }
  if(!me){
   if(S.users.some(function(u){return u.email===mail})){$("r-err").textContent="Účet s tímto e-mailem už existuje. Nejdřív se přihlas.";$("r-err").hidden=false;return}
   me={id:"u"+Date.now(),email:mail,pass:$("r-pass").value,name:name,nick:"",role:"runner"};S.users.push(me);S.session=me.id;
@@ -2136,7 +2184,7 @@ form.addEventListener("submit",function(e){
  S.regs.push(r);save();
  var txt=nk+", jsi přihlášen(a) na "+R[cur].n+" ("+R[cur].d+"), trať "+dist+" km, balíček "+P[pack].n+(extra?" ("+extra+")":"")+" za "+money(r.price)+". Tvoje startovní číslo je "+r.bib+", posíláme ti ho i e-mailem. Po splnění závodu dostaneš personalizovaný diplom. ";
  txt+=r.paid?"Platba proběhla ("+PAY[pay]+"). Výsledek nahraj ve svém účtu do "+R[cur].u+".":"Registrace začne platit po připsání platby. Pošli "+money(r.price)+" s variabilním symbolem "+r.bib+". Číslo účtu a QR kód přijdou e-mailem.";
- $("d-text").textContent=txt;
+ $("d-text").textContent=txt;$("d-pay").innerHTML=r.paid?"":payBox(r);
  form.hidden=true;$("done").hidden=false;window.scrollTo(0,0);$("done").focus();nav();
 });
 
@@ -2144,6 +2192,8 @@ form.addEventListener("submit",function(e){
 $("lf").addEventListener("submit",function(e){
  e.preventDefault();
  var m=$("l-mail").value.trim().toLowerCase(),p=$("l-pass").value,u=null;
+ if(LIVE){var lb2=$("lf").querySelector("button[type=submit]");lb2.disabled=true;
+  DB.login(m,p).then(function(){$("l-err").hidden=true;$("l-pass").value="";DB.refresh();authView()}).catch(function(err){$("l-err").textContent=DB.msg(err);$("l-err").hidden=false}).finally(function(){lb2.disabled=false});return}
  S.users.forEach(function(x){if(x.email===m&&x.pass===p)u=x});
  if(!u){$("l-err").textContent="E-mail nebo heslo nesedí. Zkus to znovu.";$("l-err").hidden=false;return}
  $("l-err").hidden=true;me=u;S.session=u.id;save();$("l-pass").value="";authView();
@@ -2240,7 +2290,7 @@ function renderAcc(){
  $("acc-list").innerHTML=mine.length?mine.map(function(r){
   var c=R[r.race],ch=isCh(r.race),st=status(r)[1],x=res(r),h='<article class="rc" style="--c:'+esc(c.c)+'"><div class="top"><h3>'+esc(c.n)+'</h3>'+chip(r)+'</div>';
   h+='<div class="meta"><span>Termín <b>'+c.d+'</b></span><span>'+(ch?"Cíl":"Trať")+' <b>'+r.dist+' km</b></span><span>Balíček <b>'+P[r.pack].n+(r.extra?" ("+esc(r.extra)+")":"")+'</b></span><span>Startovní číslo <b>'+r.bib+'</b></span><span>Přezdívka ve výsledcích <b>'+esc(nick(r))+'</b></span><span>Platba <b>'+PAY[r.pay]+', '+money(r.price)+'</b></span></div>';
-  if(st==="wait")h+='<p class="payinfo" style="margin:0">Čekáme na platbu převodem. Pošli '+money(r.price)+' s variabilním symbolem <b>'+r.bib+'</b>. Jakmile platba dorazí, závod se ti odemkne.</p>';
+  if(st==="wait")h+='<p class="payinfo" style="margin:0">Čekáme na platbu převodem. Jakmile platba dorazí, závod se ti odemkne.</p>'+payBox(r);
   if(st==="idle")h+='<p class="note">Závod začíná '+czDate(c.f)+'. Výsledek půjde nahrát od prvního dne závodu do '+c.u+'.</p>';
   if(ch&&st!=="wait"&&st!=="idle"){
    var k=chKm(r),pct=Math.min(100,Math.round(k/r.dist*100));
@@ -2307,7 +2357,7 @@ $("acc").addEventListener("submit",function(e){
  var dup=dupOf(null,d,km,t);if(dup)return fail(dup);
  function ok(img){
   if(!img&&!link&&!trk)return fail("Obrázek se nepodařilo načíst. Zkus JPG nebo PNG.");
-  S.aseq++;var a={id:"a"+S.aseq,userId:me.id,date:d,km:km,time:fmtT(secs(t)),file:file?file.name:"odkaz",img:img||"",link:link||"",status:"pending",note:"",regId:null};if(trk){a.source="file";a.trk=f._track.fmt}
+  S.aseq++;var a={id:LIVE?newId("a"):"a"+S.aseq,userId:me.id,date:d,km:km,time:fmtT(secs(t)),file:file?file.name:"odkaz",img:img||"",link:link||"",status:"pending",note:"",regId:null};if(trk){a.source="file";a.trk=f._track.fmt}
   S.acts.push(a);save();
   if(r)assign(r,a);else{var ex=[],rr=null;if(f.classList.contains("q"))f.querySelectorAll("input[name=cnt]").forEach(function(c){if(c.dataset.k==="ch"&&!c.checked)ex.push(c.value);if(c.dataset.k==="run"&&c.checked)rr=regById(c.value)});
    if(ex.length){a.excl=ex;save()}if(rr&&rr.userId===me.id)assign(rr,a);else renderAcc();showAfter(a)}
@@ -2855,6 +2905,200 @@ document.addEventListener("keydown",function(e){
  if(e.key==="Escape")lb.hidden=true;
  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("thumb")&&e.target.src){e.preventDefault();zoom(e.target.src)}
 });
+/* ---------- ostrý provoz: Supabase (zapne se vyplněním config.js) ---------- */
+var DB=null;
+function newId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+if(LIVE)DB=(function(){
+ var sb=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ var snap={events:{},regs:{},acts:{},profiles:{}},busy=null,again=false;
+ function mine(row){return !!me&&(me.role==="admin"||row.userId===me.id)}
+ function evTo(e){var d={};for(var k in e)if(k!=="d"&&k!=="u"&&k.charAt(0)!=="_")d[k]=e[k];return {id:e.id,kind:e.kind,f:e.f,e:e.e,up:e.up,data:d}}
+ function evFrom(x){var e=x.data||{};e.id=x.id;e.kind=x.kind;e.f=x.f;e.e=x.e;e.up=x.up;return e}
+ function regTo(r){return {id:r.id,user_id:r.userId,race:r.race,dist:r.dist,nick:r.nick||"",pack:r.pack||"start",extra:r.extra||null,act_id:r.actId||null,otime:r.otime||null,paid:!!r.paid}}
+ function regFrom(x){return {id:x.id,userId:x.user_id,race:x.race,dist:+x.dist,nick:x.nick||"",pack:x.pack||"start",extra:x.extra||"",pay:"bank",price:x.price||0,paid:!!x.paid,paidAt:x.paid_at?String(x.paid_at).slice(0,10):"",bib:x.bib,vs:x.vs||String(x.bib),at:x.at,actId:x.act_id||null,otime:x.otime||""}}
+ function actTo(a){return {id:a.id,user_id:a.userId,date:a.date,km:a.km,time:a.time,img:a._path||null,file:a.file||null,link:a.link||null,source:a.source||"screen",trk:a.trk?{f:a.trk}:null,status:a.status,note:a.note||null,reg_id:a.regId||null,excl:a.excl||[]}}
+ function actFrom(x){return {id:x.id,userId:x.user_id,date:x.date,km:+x.km,time:x.time,_path:x.img||null,img:"",file:x.file||"",link:x.link||"",source:x.source||"screen",trk:x.trk&&x.trk.f||null,status:x.status,note:x.note||"",regId:x.reg_id||null,excl:x.excl||[]}}
+ function profTo(u){return {id:u.id,name:u.name||"",nick:u.nick||"",year:u.year||null,team:u.team||null,street:u.street||null,city:u.city||null,zip:u.zip||null,news:!!u.news,role:u.role||"runner"}}
+ function profFrom(x){return {id:x.id,email:x.email,name:x.name||"",nick:x.nick||"",year:x.year,team:x.team,street:x.street,city:x.city,zip:x.zip,news:x.news,role:x.role}}
+ var TO={events:evTo,regs:regTo,acts:actTo,profiles:profTo};
+ function put(t,row){snap[t][row.id]=JSON.stringify(TO[t](row))}
+ async function all(t,f){var out=[],from=0;for(;;){var q=sb.from(t).select("*").range(from,from+999);if(f)q=f(q);var r=await q;if(r.error)throw r.error;out=out.concat(r.data);if(r.data.length<1000)return out;from+=1000}}
+ async function load(){
+  S.events=(await all("events")).map(evFrom);
+  var ses=(await sb.auth.getSession()).data.session;me=null;S.users=[];
+  if(ses){var p=await sb.from("profiles").select("*").eq("id",ses.user.id).maybeSingle();if(p.data)me=profFrom(p.data)}
+  var regs,acts;
+  if(me&&me.role==="admin"){
+   S.users=(await all("profiles")).map(profFrom);me=user(me.id)||me;
+   regs=(await all("regs")).map(regFrom);acts=(await all("acts")).map(actFrom);
+  }else{
+   if(me)S.users=[me];
+   regs=(await all("pub_regs")).map(function(x){var r=regFrom(x);r.price=0;return r});
+   acts=(await all("pub_acts")).map(actFrom);
+   if(me){
+    regs=regs.filter(function(r){return r.userId!==me.id}).concat((await all("regs",function(q){return q.eq("user_id",me.id)})).map(regFrom));
+    acts=acts.filter(function(a){return a.userId!==me.id}).concat((await all("acts",function(q){return q.eq("user_id",me.id)})).map(actFrom));
+   }
+  }
+  S.regs=regs;S.acts=acts;S.session=me?me.id:null;
+  snap={events:{},regs:{},acts:{},profiles:{}};
+  S.events.forEach(function(e){put("events",e)});
+  S.regs.filter(mine).forEach(function(r){put("regs",r)});
+  S.acts.filter(mine).forEach(function(a){put("acts",a)});
+  S.users.forEach(function(u){if(me&&(me.role==="admin"||u.id===me.id))put("profiles",u)});
+  await signAll();
+  await pending();
+ }
+ async function signAll(){
+  var list=S.acts.filter(function(a){return a._path&&!a.img});
+  for(var i=0;i<list.length;i+=100){
+   var part=list.slice(i,i+100),r=await sb.storage.from("proofs").createSignedUrls(part.map(function(a){return a._path}),6*3600);
+   if(!r.error)r.data.forEach(function(x,j){if(x.signedUrl)part[j].img=x.signedUrl});
+  }
+ }
+ function blob(dataUrl){var p=dataUrl.split(","),m=p[0].match(/:(.*?);/)[1],b=atob(p[1]),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new Blob([u],{type:m})}
+ function ext(t){return t==="image/png"?"png":t==="image/webp"?"webp":t==="image/svg+xml"?"svg":"jpg"}
+ async function upProof(a){
+  if(!a.img||a.img.indexOf("data:")!==0)return;
+  var b=blob(a.img),path=a.userId+"/"+a.id+"-"+Date.now().toString(36)+"."+ext(b.type),old=a._path;
+  var r=await sb.storage.from("proofs").upload(path,b,{contentType:b.type,upsert:false});if(r.error)throw r.error;
+  a._path=path;if(old)sb.storage.from("proofs").remove([old]);
+ }
+ async function upEvImgs(e){
+  for(var k of ["img","bg"]){
+   if(!e[k]||String(e[k]).indexOf("data:")!==0)continue;
+   var b=blob(e[k]),path=e.id+"/"+k+"-"+Date.now().toString(36)+"."+ext(b.type);
+   var r=await sb.storage.from("events").upload(path,b,{contentType:b.type,upsert:true});if(r.error)throw r.error;
+   e[k]=sb.storage.from("events").getPublicUrl(path).data.publicUrl;
+  }
+ }
+ function merge(t,o,x){
+  if(t==="regs"){var n=regFrom(x);o.price=n.price;o.bib=n.bib;o.vs=n.vs;o.paid=n.paid;o.paidAt=n.paidAt;o.at=n.at}
+  if(t==="acts"){o.status=x.status;o.note=x.note||""}
+  if(t==="profiles"){o.role=x.role}
+ }
+ async function diff(t,rows,ins,del){
+  var seen={};
+  for(var o of rows){
+   seen[o.id]=1;var row=TO[t](o),j=JSON.stringify(row),had=snap[t][o.id]!==undefined;
+   if(had&&snap[t][o.id]===j)continue;
+   if(!had&&!ins)continue;
+   var r=had?await sb.from(t).update(row).eq("id",o.id).select().maybeSingle():await sb.from(t).insert(row).select().maybeSingle();
+   if(r.error)throw r.error;if(r.data)merge(t,o,r.data);put(t,o);
+  }
+  if(del)for(var id in snap[t])if(!seen[id]){var gone=JSON.parse(snap[t][id]),d=await sb.from(t).delete().eq("id",id);if(d.error)throw d.error;delete snap[t][id];if(t==="acts"&&gone.img)sb.storage.from("proofs").remove([gone.img])}
+ }
+ async function run(){
+  if(!me)return;
+  if(me.role==="admin"){for(var e of S.events)await upEvImgs(e);await diff("events",S.events,true,true)}
+  await diff("profiles",S.users.filter(function(u){return me.role==="admin"||u.id===me.id}),false,false);
+  var ma=S.acts.filter(mine);for(var a of ma)await upProof(a);
+  await diff("acts",ma,true,true);
+  await diff("regs",S.regs.filter(mine),false,false);
+ }
+ function sync(){
+  if(busy){again=true;return busy}
+  busy=run().catch(function(err){console.error(err);toast("Změnu se nepodařilo uložit na server: "+msg(err)+" Zkus to prosím znovu.",true);return load().then(refresh)})
+   .finally(function(){busy=null;if(again){again=false;sync()}});
+  return busy;
+ }
+ function msg(e){var m=String(e&&(e.message||e.error_description)||e||"");
+  if(/already registered|already been registered/i.test(m))return "Účet s tímto e-mailem už existuje. Nejdřív se přihlas.";
+  if(/Invalid login credentials/i.test(m))return "E-mail nebo heslo nesedí. Zkus to znovu.";
+  if(/Email not confirmed/i.test(m))return "E-mail ještě není potvrzený. Klikni na odkaz v e-mailu, který ti přišel.";
+  if(/duplicate key.*user_id/i.test(m)||/regs_user_id_race_dist_key/.test(m))return "Na tuhle trať už jsi přihlášen(a).";
+  if(/Password should be/i.test(m))return "Heslo musí mít aspoň 6 znaků.";
+  if(/rate limit|too many/i.test(m))return "Moc pokusů za sebou. Zkus to za pár minut.";
+  if(/Failed to fetch|NetworkError/i.test(m))return "Nejde se připojit k serveru. Zkontroluj internet.";
+  return m;
+ }
+ function refresh(){
+  loadR();fillSelects();renderHome();
+  if(now==="acc"&&me&&me.role!=="admin")renderAcc();else if(now==="adm"&&me&&me.role==="admin")renderAdm();else if((now==="acc"||now==="adm")&&!me)view("login");
+  if(now==="reg")renderReg();
+  nav();
+ }
+ /* registrace: založí účet (když chybí) a přihlášku; startovní číslo a VS přidělí server */
+ var PKEY="rungame-pending-reg";
+ async function register(o){
+  if(!me){
+   var s=await sb.auth.signUp({email:o.mail,password:o.pass,options:{data:{name:o.name,nick:o.nick,year:o.year,team:o.team,news:o.news},emailRedirectTo:location.origin+location.pathname+"#ucet"}});
+   if(s.error)throw s.error;
+   if(s.data.user&&s.data.user.identities&&!s.data.user.identities.length)throw new Error("already registered");
+   if(!s.data.session){try{localStorage.setItem(PKEY,JSON.stringify({race:o.race,dist:o.dist,nick:o.nick}))}catch(e){}return {confirm:true}}
+   await load();
+  }else if(o.nick&&me.nick!==o.nick){me.nick=o.nick;await diff("profiles",[me],false,false)}
+  return {reg:await addReg(o.race,o.dist,o.nick)};
+ }
+ async function addReg(race,dist,nk){
+  var r=await sb.from("regs").insert({id:newId("r"),user_id:me.id,race:race,dist:dist,nick:nk||""}).select().single();
+  if(r.error)throw r.error;var reg=regFrom(r.data);S.regs.push(reg);put("regs",reg);return reg;
+ }
+ async function pending(){
+  if(!me)return;var p=null;try{p=JSON.parse(localStorage.getItem(PKEY)||"null")}catch(e){}
+  if(!p)return;try{localStorage.removeItem(PKEY)}catch(e){}
+  try{var reg=await addReg(p.race,p.dist,p.nick);toast("E-mail je potvrzený a registrace uložená. Startovní číslo "+reg.bib+". Zaplať prosím startovné, QR platbu najdeš u závodu.")}catch(e){toast(msg(e),true)}
+ }
+ async function login(mail,pass){var r=await sb.auth.signInWithPassword({email:mail,password:pass});if(r.error)throw r.error;await load()}
+ async function logout(){await sb.auth.signOut();await load()}
+ async function resetMail(mail){var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname+"#nove-heslo"});if(r.error)throw r.error}
+ async function newPass(p){var r=await sb.auth.updateUser({password:p});if(r.error)throw r.error}
+ /* úklid screenshotů: po uzávěrce nahrávání + N dní (u schválených a vrácených běhů) */
+ async function cleanup(days){
+  var lim=new Date();lim.setDate(lim.getDate()-days);var iso=lim.toISOString().slice(0,10),n=0;
+  var old=S.acts.filter(function(a){
+   if(!a._path||a.status==="pending")return false;
+   var r=a.regId?regById(a.regId):null,end=r&&R[r.race]?R[r.race].up:a.date;
+   S.regs.forEach(function(x){if(x.userId===a.userId&&R[x.race]&&isCh(x.race)&&a.date>=R[x.race].f&&a.date<=R[x.race].e&&R[x.race].up>end)end=R[x.race].up});
+   return end<iso});
+  for(var i=0;i<old.length;i+=100){
+   var part=old.slice(i,i+100),r=await sb.storage.from("proofs").remove(part.map(function(a){return a._path}));
+   if(r.error)throw r.error;part.forEach(function(a){a._path=null;a.img="";n++});
+  }
+  await diff("acts",S.acts.filter(mine),false,false);return n;
+ }
+ async function boot(){
+  try{await load()}catch(e){console.error(e);toast("Nepodařilo se načíst data ze serveru: "+msg(e),true)}
+  sb.auth.onAuthStateChange(function(ev){if(ev==="PASSWORD_RECOVERY")setTimeout(function(){view("login");showPassForm("new")},0)});
+  if(/^#nove-heslo/.test(location.hash)||/type=recovery/.test(location.hash)){view("login");showPassForm("new")}
+ }
+ return {sb:sb,boot:boot,load:load,sync:sync,refresh:refresh,register:register,login:login,logout:logout,resetMail:resetMail,newPass:newPass,cleanup:cleanup,msg:msg};
+})();
+
+/* ---------- drobné hlášky ---------- */
+function toast(t,bad){var el=$("toast");if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");document.body.appendChild(el)}
+ el.textContent=t;el.className=bad?"bad":"";el.hidden=false;clearTimeout(el._t);el._t=setTimeout(function(){el.hidden=true},bad?9000:6000)}
+
+/* ---------- QR platba (formát SPD České bankovní asociace) ---------- */
+function czIban(acc){
+ var m=String(acc||"").replace(/\s/g,"").match(/^(?:(\d{1,6})-)?(\d{2,10})\/(\d{4})$/);if(!m)return "";
+ var bban=m[3]+("000000"+(m[1]||"")).slice(-6)+("0000000000"+m[2]).slice(-10);
+ var num=bban+"1235"+"00",r=0;for(var i=0;i<num.length;i++)r=(r*10+ +num[i])%97;
+ return "CZ"+("0"+(98-r)).slice(-2)+bban;
+}
+function bankInfo(){var b=CFG.bank||{};return {acc:b.account||"",iban:b.iban||czIban(b.account),name:b.name||"RunGame"}}
+function spd(r){var b=bankInfo();if(!b.iban)return "";
+ return "SPD*1.0*ACC:"+b.iban+"*AM:"+Number(r.price).toFixed(2)+"*CC:CZK*X-VS:"+(r.vs||r.bib)+"*MSG:RUNGAME "+(r.vs||r.bib)+"*RN:"+b.name.toUpperCase().replace(/[^A-Z0-9 ]/g,"")}
+function qrImg(text){if(!text||!window.qrcode)return "";var q=qrcode(0,"M");q.addData(text);q.make();return q.createDataURL(5,8)}
+function payBox(r){
+ var b=bankInfo(),q=qrImg(spd(r)),vs=r.vs||r.bib;
+ return '<div class="qrpay">'+(q?'<img src="'+q+'" alt="QR platba '+money(r.price)+', VS '+vs+'" width="180" height="180">':'')
+  +'<div><p class="flab">Zaplať převodem do 5 dnů</p><dl><dt>Částka</dt><dd><b>'+money(r.price)+'</b></dd><dt>Účet</dt><dd><b>'+esc(b.acc||"doplní se v config.js")+'</b></dd><dt>Variabilní symbol</dt><dd><b>'+vs+'</b></dd></dl>'
+  +'<p class="note">QR kód naskenuj v aplikaci své banky. Platbu párujeme podle variabilního symbolu, obvykle do 2 pracovních dnů.</p></div></div>';
+}
+
+/* ---------- import výpisu z banky (CSV) ---------- */
+function bankCsv(text){
+ var lines=text.replace(/\r/g,"").split("\n").filter(function(l){return l.trim()}),hits=[],seen={};
+ var open=S.regs.filter(function(r){return !r.paid}),byVs={};open.forEach(function(r){byVs[String(r.vs||r.bib)]=r});
+ lines.forEach(function(l){
+  var cells=l.split(/[;\t]|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(function(c){return c.replace(/^"|"$/g,"").trim()});
+  var amts=cells.map(function(c){var t=c.replace(/[\s\u00a0]/g,"").replace(/CZK|Kč/gi,"");if(!/^[+]?\d+([.,]\d{1,2})?$/.test(t))return null;return parseFloat(t.replace(",","."))});
+  cells.forEach(function(c,ci){var v=c.replace(/^0+/,"");var r=byVs[v];if(r&&!seen[r.id]&&amts.some(function(x,ai){return ai!==ci&&x!==null&&x>=r.price-0.001&&x<r.price*3})){seen[r.id]=1;hits.push(r)}});
+ });
+ return hits;
+}
+
 /* ---------- clicks ---------- */
 var WHY="Na záznamu není vidět datum, vzdálenost nebo čas. Nahraj prosím nový důkaz.";
 document.addEventListener("click",function(e){
@@ -2881,7 +3125,7 @@ document.addEventListener("click",function(e){
  var l=e.target.closest("a");if(!l)return;
  if(l.dataset.view==="res"){e.preventDefault();if(l.dataset.rr)rcur=l.dataset.rr;view("res");return}
  if(l.dataset.view==="auth"){e.preventDefault();authView();return}
- if(l.dataset.view==="logout"){e.preventDefault();me=null;S.session=null;save();view("home");window.scrollTo(0,0);return}
+ if(l.dataset.view==="logout"){e.preventDefault();if(LIVE){DB.logout().then(function(){DB.refresh();view("home");window.scrollTo(0,0)});return}me=null;S.session=null;save();view("home");window.scrollTo(0,0);return}
  if(l.hasAttribute("data-race")){
   e.preventDefault();
   if(l.dataset.race&&R[l.dataset.race])cur=l.dataset.race;
@@ -2894,7 +3138,26 @@ document.addEventListener("click",function(e){
   var t=document.getElementById(h.slice(1));if(t)t.scrollIntoView();
  }
 });
-renderHome();renderReg();nav();
+document.documentElement.classList.toggle("live",LIVE);
+function showPassForm(m){$("lf").hidden=m!=="login";$("pf").hidden=m!=="forgot";$("npf").hidden=m!=="new";if(m==="forgot")$("pf-mail").value=$("l-mail").value}
+$("l-forgot").addEventListener("click",function(e){e.preventDefault();showPassForm("forgot")});
+$("pf").addEventListener("submit",function(e){e.preventDefault();
+ if(!LIVE){$("pf-err").textContent="V ukázce se e-maily neposílají.";$("pf-err").hidden=false;return}
+ DB.resetMail($("pf-mail").value.trim()).then(function(){$("pf-err").hidden=true;$("pf-ok").textContent="Hotovo. Pokud účet s tímto e-mailem existuje, přijde ti odkaz na nové heslo.";$("pf-ok").hidden=false})
+ .catch(function(err){$("pf-err").textContent=DB.msg(err);$("pf-err").hidden=false})});
+$("npf").addEventListener("submit",function(e){e.preventDefault();var pw=$("np-pass").value;
+ if(pw.length<8){$("np-err").textContent="Heslo musí mít aspoň 8 znaků.";$("np-err").hidden=false;return}
+ DB.newPass(pw).then(function(){toast("Heslo je změněné.");showPassForm("login");history.replaceState(null,"",location.pathname);DB.load().then(function(){DB.refresh();authView()})})
+ .catch(function(err){$("np-err").textContent=DB.msg(err);$("np-err").hidden=false})});
+$("csv-in").addEventListener("change",function(){var f=this.files[0];if(!f)return;var inp=this;
+ f.arrayBuffer().then(function(buf){var t=new TextDecoder("utf-8").decode(buf);if(t.indexOf("\ufffd")>=0)t=new TextDecoder("windows-1250").decode(buf);
+  var hits=bankCsv(t);hits.forEach(function(r){r.paid=true;r.paidAt=today()});
+  $("csv-msg").textContent=hits.length?"Spárováno "+hits.length+" "+(hits.length===1?"platba":hits.length<5?"platby":"plateb")+": VS "+hits.map(function(r){return r.vs||r.bib}).join(", ")+". Chybu vrátíš tlačítkem Zrušit platbu.":"Ve výpisu jsme nenašli žádnou novou platbu s variabilním symbolem otevřené registrace.";
+  if(hits.length){save();renderAdm()}inp.value=""})});
+$("clean-btn").addEventListener("click",function(){if(!LIVE)return;var b=this;b.disabled=true;$("clean-msg").textContent="Mažu…";
+ DB.cleanup(30).then(function(n){$("clean-msg").textContent=n?"Smazáno "+n+" screenshotů.":"Nic ke smazání."}).catch(function(err){$("clean-msg").textContent=DB.msg(err)}).finally(function(){b.disabled=false})});
+if(LIVE){renderHome();nav();DB.boot().then(function(){DB.refresh();renderReg();if(/^#(ucet|admin)/.test(location.hash)&&me)authView()})}
+else{renderHome();renderReg();nav();}
 })();
 </script>
 </body>

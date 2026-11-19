@@ -1,0 +1,43 @@
+# Noční záloha databáze Supabase (šifrovaná).
+# Potřebuje v GitHubu: Settings → Secrets and variables → Actions → New repository secret
+#   SUPABASE_DB_URL  = Supabase → Connect → Session pooler → URI (s doplněným heslem k databázi)
+#   ZALOHA_HESLO     = libovolné dlouhé heslo, kterým se záloha zašifruje (ulož si ho i mimo GitHub!)
+# Zálohu najdeš v záložce Actions → poslední běh → Artifacts. Rozšifrování:
+#   openssl enc -d -aes-256-cbc -pbkdf2 -in rungame.sql.gz.enc -out rungame.sql.gz -pass pass:TVOJE_HESLO
+name: Noční záloha databáze
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  zaloha:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kontrola nastavení
+        id: chk
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PW: ${{ secrets.ZALOHA_HESLO }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$PW" ]; then echo "Chybí SUPABASE_DB_URL nebo ZALOHA_HESLO, záloha se přeskočí."; echo "ok=0" >> "$GITHUB_OUTPUT"; else echo "ok=1" >> "$GITHUB_OUTPUT"; fi
+      - name: Záloha a šifrování
+        if: steps.chk.outputs.ok == '1'
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          ZALOHA_HESLO: ${{ secrets.ZALOHA_HESLO }}
+        run: |
+          set -euo pipefail
+          docker run --rm -e DB postgres:17 sh -c 'pg_dump "$DB" --no-owner --no-privileges --schema=public --schema=auth' | gzip -9 > rungame.sql.gz
+          test -s rungame.sql.gz
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in rungame.sql.gz -out rungame.sql.gz.enc -pass env:ZALOHA_HESLO
+          rm rungame.sql.gz
+          ls -la rungame.sql.gz.enc
+      - name: Uložit zálohu
+        if: steps.chk.outputs.ok == '1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: zaloha-${{ github.run_id }}
+          path: rungame.sql.gz.enc
+          retention-days: 30
