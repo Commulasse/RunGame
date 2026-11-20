@@ -2961,6 +2961,7 @@ document.addEventListener("keydown",function(e){
  if((e.key==="Enter"||e.key===" ")&&e.target.classList&&e.target.classList.contains("thumb")&&e.target.src){e.preventDefault();zoom(e.target.src)}
 });
 /* ---------- ostrý provoz: Supabase (zapne se vyplněním config.js) ---------- */
+function sPath(){return location.pathname.replace(/^\/+/,"/")}
 var DB=null;
 function newId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 if(LIVE)DB=(function(){
@@ -3077,7 +3078,7 @@ if(LIVE)DB=(function(){
  var PKEY="rungame-pending-reg";
  async function register(o){
   if(!me){
-   var s=await sb.auth.signUp({email:o.mail,password:o.pass,options:{data:{name:o.name,nick:o.nick,year:o.year,team:o.team,news:o.news},emailRedirectTo:location.origin+location.pathname+"#ucet"}});
+   var s=await sb.auth.signUp({email:o.mail,password:o.pass,options:{data:{name:o.name,nick:o.nick,year:o.year,team:o.team,news:o.news},emailRedirectTo:location.origin+sPath()+"#ucet"}});
    if(s.error)throw s.error;
    if(s.data.user&&s.data.user.identities&&!s.data.user.identities.length)throw new Error("already registered");
    if(!s.data.session){try{localStorage.setItem(PKEY,JSON.stringify({race:o.race,dist:o.dist,nick:o.nick}))}catch(e){}return {confirm:true}}
@@ -3095,7 +3096,7 @@ if(LIVE)DB=(function(){
   try{var reg=await addReg(p.race,p.dist,p.nick);toast("E-mail je potvrzený a registrace uložená. Startovní číslo "+reg.bib+". Zaplať prosím startovné, QR platbu najdeš u závodu.")}catch(e){toast(msg(e),true)}
  }
  async function signUp(o){
-  var s=await sb.auth.signUp({email:o.mail,password:o.pass,options:{data:{name:o.name,nick:o.nick,year:o.year,team:o.team,news:o.news},emailRedirectTo:location.origin+location.pathname+"#ucet"}});
+  var s=await sb.auth.signUp({email:o.mail,password:o.pass,options:{data:{name:o.name,nick:o.nick,year:o.year,team:o.team,news:o.news},emailRedirectTo:location.origin+sPath()+"#ucet"}});
   if(s.error)throw s.error;
   if(s.data.user&&s.data.user.identities&&!s.data.user.identities.length)throw new Error("already registered");
   if(!s.data.session)return {confirm:true};
@@ -3103,7 +3104,7 @@ if(LIVE)DB=(function(){
  }
  async function login(mail,pass){var r=await sb.auth.signInWithPassword({email:mail,password:pass});if(r.error)throw r.error;await load()}
  async function logout(){await sb.auth.signOut();await load()}
- async function resetMail(mail){var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname+"#nove-heslo"});if(r.error)throw r.error}
+ async function resetMail(mail){var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+sPath()+"#nove-heslo"});if(r.error)throw r.error}
  async function newPass(p){var r=await sb.auth.updateUser({password:p});if(r.error)throw r.error}
  /* úklid screenshotů: po uzávěrce nahrávání + N dní (u schválených a vrácených běhů) */
  async function cleanup(days){
@@ -3123,8 +3124,8 @@ if(LIVE)DB=(function(){
  async function fromLink(){
   var q=new URLSearchParams(location.search),th=q.get("token_hash"),ty=q.get("type");
   var h=new URLSearchParams(location.hash.replace(/^#/,"").split("#").pop());
-  if(!th){if(h.get("error_code")||h.get("error")){history.replaceState(null,"",location.pathname);return {bad:h.get("error_code")||h.get("error")}}return null}
-  history.replaceState(null,"",location.pathname+(ty==="recovery"?"#nove-heslo":"#ucet"));
+  if(!th){if(h.get("error_code")||h.get("error")){history.replaceState(null,"",sPath());return {bad:h.get("error_code")||h.get("error")}}return null}
+  history.replaceState(null,"",sPath()+(ty==="recovery"?"#nove-heslo":"#ucet"));
   return {ask:true,th:th,type:ty||"email"};
  }
  /* ověření až po kliknutí – roboti, kteří kontrolují odkazy v poště, na tlačítko nekliknou */
@@ -3239,7 +3240,7 @@ $("pf").addEventListener("submit",function(e){e.preventDefault();
  .catch(function(err){$("pf-err").textContent=DB.msg(err);$("pf-err").hidden=false})});
 $("npf").addEventListener("submit",function(e){e.preventDefault();var pw=$("np-pass").value;
  if(pw.length<8){$("np-err").textContent="Heslo musí mít aspoň 8 znaků.";$("np-err").hidden=false;return}
- DB.newPass(pw).then(function(){toast("Heslo je změněné.");showPassForm("login");history.replaceState(null,"",location.pathname);DB.load().then(function(){DB.refresh();authView()})})
+ DB.newPass(pw).then(function(){toast("Heslo je změněné.");showPassForm("login");history.replaceState(null,"",sPath());DB.load().then(function(){DB.refresh();authView()})})
  .catch(function(err){$("np-err").textContent=DB.msg(err);$("np-err").hidden=false})});
 $("csv-in").addEventListener("change",function(){var f=this.files[0];if(!f)return;var inp=this;
  f.arrayBuffer().then(function(buf){var t=new TextDecoder("utf-8").decode(buf);if(t.indexOf("\ufffd")>=0)t=new TextDecoder("windows-1250").decode(buf);
