@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Potvrď nový e-mail</title></head>
+<body style="margin:0;padding:0;background:#f3f2f7;font-family:Arial,Helvetica,sans-serif;color:#16131f">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f2f7;padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #e3e0ec">
+<tr><td style="background:#0d0b14;padding:18px 28px;font-size:22px;font-weight:bold;letter-spacing:2px;color:#ffffff">RUN<span style="color:#d8ff3c">GAME</span></td></tr>
+<tr><td style="padding:28px 28px 8px 28px">
+<h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.3;color:#16131f">Potvrď nový e-mail</h1>
+<p style="margin:0 0 12px 0;font-size:15px;line-height:1.6">Ahoj,</p><p style="margin:0 0 12px 0;font-size:15px;line-height:1.6">u účtu RunGame se mění e-mail z {{ .Email }} na {{ .NewEmail }}. Potvrď změnu tlačítkem níže.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0"><tr><td style="background:#d8ff3c">
+<a href="{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=email_change" style="display:inline-block;padding:14px 26px;font-size:16px;font-weight:bold;color:#0d0b14;text-decoration:none">Potvrdit změnu</a></td></tr></table>
+<p style="margin:0 0 16px 0;font-size:13px;line-height:1.5;color:#6b6578">Když tlačítko nefunguje, zkopíruj do prohlížeče tento odkaz:<br><a href="{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=email_change" style="color:#5b2be0;word-break:break-all">{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=email_change</a></p>
+<p style="margin:0 0 24px 0;font-size:13px;line-height:1.5;color:#6b6578">Pokud jsi změnu nezadával(a), e-mail ignoruj a napiš nám na info@rungame.cz.</p>
+</td></tr>
+<tr><td style="border-top:1px solid #e3e0ec;padding:16px 28px;font-size:12px;line-height:1.5;color:#8a849a">RunGame – virtuální běžecké závody · <a href="https://rungame.cz" style="color:#8a849a">rungame.cz</a> · <a href="mailto:info@rungame.cz" style="color:#8a849a">info@rungame.cz</a></td></tr>
+</table></td></tr></table></body></html>
