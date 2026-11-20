@@ -3254,7 +3254,7 @@ document.addEventListener("click",function(e){var g=e.target.closest("[data-go]"
  if(t==="login"){showPassForm("login");if(me){authView();return}view("login")}});
 $("sf").addEventListener("submit",function(e){e.preventDefault();var f=this,er=$("s-err");er.hidden=true;
  var bad=[].slice.call(f.querySelectorAll("input")).filter(function(i){return !i.checkValidity()})[0];
- if(bad){er.textContent=bad.type==="checkbox"?"Potvrď prosím povinné souhlasy.":bad.id==="s-pass"?"Heslo musí mít aspoň 8 znaků.":bad.id==="s-mail"?"Zkontroluj e-mail.":"Vyplň prosím všechna povinná pole.";er.hidden=false;bad.focus();return}
+ if(bad){er.textContent=bad.type==="checkbox"?"Potvrď prosím povinné souhlasy.":bad.id==="s-pass"?"Heslo musí mít aspoň 8 znaků.":bad.id==="s-mail"?"Zkontroluj e-mail.":bad.id==="s-year"&&bad.value?"Registrovat se můžou jen lidé starší 18 let (rok narození 1920–2008).":"Vyplň prosím všechna povinná pole.";er.hidden=false;bad.focus();return}
  var o={mail:$("s-mail").value.trim().toLowerCase(),pass:$("s-pass").value,name:($("s-fn").value.trim()+" "+$("s-ln").value.trim()).trim(),nick:$("s-nick").value.trim(),year:+$("s-year").value||null,team:$("s-team").value.trim(),news:$("s-c4").checked};
  if(!LIVE){if(S.users.some(function(u){return u.email===o.mail})){er.textContent="Účet s tímto e-mailem už existuje. Přihlas se.";er.hidden=false;return}
   me={id:"u"+Date.now(),email:o.mail,pass:o.pass,name:o.name,nick:o.nick,year:o.year,team:o.team,role:"runner"};S.users.push(me);S.session=me.id;save();f.reset();toast("Účet je založený. Vítej, "+o.nick+".");afterAuth();return}
