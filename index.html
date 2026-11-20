@@ -1329,7 +1329,9 @@ html:not(.live) [data-live]{display:none!important}
 .csvimp label.btn{cursor:pointer}
 #notice{position:relative;z-index:5;display:flex;gap:12px;align-items:center;justify-content:center;background:var(--lime);color:#0d0b14;padding:14px 48px 14px 16px;font-weight:700;font-size:1rem;text-align:center}
 #notice[hidden]{display:none}
-#notice button{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;color:#0d0b14;font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px}
+#notice .nb{background:#0d0b14;color:var(--lime);border:0;padding:10px 18px;font-weight:700;font-size:.95rem;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
+#notice .nb[disabled]{opacity:.6;cursor:wait}
+#notice>button:last-child{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;color:#0d0b14;font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99;max-width:min(560px,calc(100vw - 32px));background:#15121f;color:#fff;border-left:3px solid var(--lime);padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:.92rem}
 #toast.bad{border-left-color:var(--red,#ff5470)}
 #toast[hidden]{display:none}
@@ -3123,27 +3125,38 @@ if(LIVE)DB=(function(){
   var h=new URLSearchParams(location.hash.replace(/^#/,"").split("#").pop());
   if(!th){if(h.get("error_code")||h.get("error")){history.replaceState(null,"",location.pathname);return {bad:h.get("error_code")||h.get("error")}}return null}
   history.replaceState(null,"",location.pathname+(ty==="recovery"?"#nove-heslo":"#ucet"));
-  var r=await sb.auth.verifyOtp({token_hash:th,type:ty||"email"});
-  return r.error?{bad:r.error.message||"otp"}:{type:ty};
+  return {ask:true,th:th,type:ty||"email"};
+ }
+ /* ověření až po kliknutí – roboti, kteří kontrolují odkazy v poště, na tlačítko nekliknou */
+ async function finishLink(link){
+  var r=await sb.auth.verifyOtp({token_hash:link.th,type:link.type});
+  if(r.error){notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit.");view("login");showPassForm("login");return}
+  try{await load()}catch(e){}
+  refresh();
+  if(link.type==="recovery"){$("notice").hidden=true;view("login");showPassForm("new");return}
+  if(link.type==="email_change"){notice("✓ Nový e-mail je potvrzený.");authView();return}
+  if(me){notice("✓ Účet je aktivovaný. Vítej v RunGame, "+(me.nick||me.name)+"!");authView();return}
+  notice("✓ Účet je aktivovaný. Teď se přihlas.");view("login");showPassForm("login");
  }
  async function boot(){
   var link=null;
   try{link=await fromLink()}catch(e){link={bad:msg(e)}}
   try{await load()}catch(e){console.error(e);toast("Nepodařilo se načíst data ze serveru: "+msg(e),true)}
   sb.auth.onAuthStateChange(function(ev){if(ev==="PASSWORD_RECOVERY")setTimeout(function(){view("login");showPassForm("new")},0)});
-  if(link&&link.bad){toast("Odkaz z e-mailu už neplatí (vypršel nebo byl použit). Přihlas se, případně si nech poslat nový.",true);view("login");showPassForm("login");return}
-  if(link&&link.type==="recovery"){view("login");showPassForm("new");return}
-  if(link&&link.type==="email_change"){notice("✓ Nový e-mail je potvrzený.");return}
-  if(link&&me){notice("✓ Účet je aktivovaný. Vítej v RunGame, "+(me.nick||me.name)+"!");return}
-  if(link){notice("✓ Účet je aktivovaný. Teď se přihlas.");view("login");showPassForm("login");return}
+  if(link&&link.bad){notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit.");view("login");showPassForm("login");return}
+  if(link&&link.ask){
+   var lbl=link.type==="recovery"?["Nastavení nového hesla","Pokračovat"]:link.type==="email_change"?["Potvrzení nového e-mailu","Potvrdit"]:["Poslední krok registrace","Aktivovat účet"];
+   notice(lbl[0]+" – klikni na tlačítko:",lbl[1],function(){finishLink(link).catch(function(e){notice("Něco se pokazilo: "+msg(e))})});return}
   if(/^#nove-heslo/.test(location.hash)||/type=recovery/.test(location.hash)){view("login");showPassForm("new")}
  }
  return {sb:sb,signUp:signUp,boot:boot,load:load,sync:sync,refresh:refresh,register:register,login:login,logout:logout,resetMail:resetMail,newPass:newPass,cleanup:cleanup,msg:msg};
 })();
 
 /* ---------- drobné hlášky ---------- */
-function notice(t){var el=$("notice");if(!el){el=document.createElement("div");el.id="notice";el.setAttribute("role","status");el.innerHTML='<span></span><button type="button" aria-label="Zavřít">×</button>';el.querySelector("button").addEventListener("click",function(){el.hidden=true});var hd=$("top");hd.parentNode.insertBefore(el,hd.nextSibling)}
- el.querySelector("span").textContent=t;el.hidden=false;window.scrollTo(0,0)}
+function notice(t,btn,fn){var el=$("notice");if(!el){el=document.createElement("div");el.id="notice";el.setAttribute("role","status");el.innerHTML='<span></span><button type="button" aria-label="Zavřít">×</button>';el.querySelector("button").addEventListener("click",function(){el.hidden=true});var hd=$("top");hd.parentNode.insertBefore(el,hd.nextSibling)}
+ el.querySelector("span").textContent=t;var b=el.querySelector(".nb");if(b)b.remove();
+ if(btn){b=document.createElement("button");b.type="button";b.className="nb";b.textContent=btn;b.addEventListener("click",function(){b.disabled=true;fn()});el.querySelector("span").after(b)}
+ el.hidden=false;window.scrollTo(0,0)}
 function toast(t,bad){var el=$("toast");if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");document.body.appendChild(el)}
  el.textContent=t;el.className=bad?"bad":"";el.hidden=false;clearTimeout(el._t);el._t=setTimeout(function(){el.hidden=true},bad?9000:6000)}
 
