@@ -1332,6 +1332,15 @@ html:not(.live) [data-live]{display:none!important}
 #toast[hidden]{display:none}
 .linkbtn{background:none;border:0;padding:0;color:var(--lime);text-decoration:underline;cursor:pointer;font:inherit}
 #lf[hidden],#pf[hidden],#npf[hidden]{display:none!important}
+
+/* registrace účtu */
+#sf .checks{display:grid;gap:10px;margin:6px 0 4px}
+#sf .ck{display:flex;gap:10px;align-items:flex-start;font-size:.92rem;line-height:1.4}
+#sf .ck input{width:18px;height:18px;flex:none;margin-top:2px;accent-color:var(--lime)}
+#sf .ck a,.havacc a{color:var(--lime)}
+.havacc{margin:0 0 12px;padding:10px 12px;background:#15121f;border-left:3px solid var(--lime);font-size:.92rem}
+.havacc[hidden],#s-ok[hidden],#sf[hidden]{display:none!important}
+.nbtn[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -1361,7 +1370,7 @@ html:not(.live) [data-live]{display:none!important}
     <a class="l" href="#vysledky-home">Výsledky</a>
     <span class="sp"></span>
     <span class="accn"><a class="l keep acc" href="#ucet" data-view="auth" id="nav-auth">Přihlásit</a><a class="l keep out" href="#top" data-view="logout" id="nav-out" hidden>Odhlásit</a></span>
-    <a class="nbtn" href="#zavody">Registrovat</a>
+    <a class="nbtn" href="#registrace-uctu" data-view="signup" id="nav-reg">Registrovat</a>
   </nav>
 </header>
 
@@ -1481,6 +1490,7 @@ html:not(.live) [data-live]{display:none!important}
         </div>
       </fieldset>
       <fieldset><legend>Účet závodníka<i>.</i></legend>
+        <p class="havacc" id="r-haveacc">Už máš účet? <button type="button" class="linkbtn" data-go="login-reg">Přihlas se</button> a údaje se vyplní samy.</p>
         <div class="fields">
           <label for="r-mail">E-mail<input id="r-mail" name="mail" type="email" required autocomplete="email"></label>
           <label for="r-year">Rok narození<input id="r-year" name="year" type="number" min="1920" max="2008" required inputmode="numeric"></label>
@@ -1548,7 +1558,7 @@ html:not(.live) [data-live]{display:none!important}
 
 <section id="login" class="app" hidden><div class="w">
   <h2>Přihlášení</h2>
-  <p class="lead">Účet závodníka vznikne při první registraci do závodu. V účtu najdeš své závody a nahraješ výsledek.</p>
+  <p class="lead">V účtu najdeš své závody, deník běhů a nahraješ výsledek. Nemáš účet? <button type="button" class="linkbtn" data-go="signup">Zaregistruj se</button>.</p>
   <div class="lgrid">
     <form id="lf" class="panel">
       <div class="fields">
@@ -1572,6 +1582,11 @@ html:not(.live) [data-live]{display:none!important}
       <p class="err" id="np-err" hidden></p>
       <button class="btn" type="submit" style="justify-self:start">Uložit heslo</button>
     </form>
+    <div class="panel" id="l-new">
+      <h3>Nemáš ještě účet?</h3>
+      <p class="note">Registrace zabere minutu a je zdarma. Platíš až za konkrétní závod.</p>
+      <button class="btn" type="button" data-go="signup" style="justify-self:start">Vytvořit účet</button>
+    </div>
     <div class="panel" data-demo>
       <h3>Testovací účty</h3>
       <p class="note">Jen pro ukázku. Na ostrém webu tento panel nebude.</p>
@@ -1579,6 +1594,40 @@ html:not(.live) [data-live]{display:none!important}
       <div class="acct"><div><b>Běžkyně Jana Nováková</b><br><code>jana@test.cz / test123</code></div><button class="btn g" type="button" data-fill="jana@test.cz|test123">Vyplnit</button></div>
       <div class="acct"><div><b>Běžec Tomáš Dvořák</b><br><code>tomas@test.cz / test123</code></div><button class="btn g" type="button" data-fill="tomas@test.cz|test123">Vyplnit</button></div>
       <div class="acct"><div><b>Běžec Petr Svoboda</b><br><code>petr@test.cz / test123</code></div><button class="btn g" type="button" data-fill="petr@test.cz|test123">Vyplnit</button></div>
+    </div>
+  </div>
+</div></section>
+<section id="signup" class="app" hidden><div class="w">
+  <h2>Registrace</h2>
+  <p class="lead">Založ si účet závodníka. Pak se jedním klikem přihlásíš do kteréhokoliv závodu a běhy nahráváš do deníku. Účet je zdarma, platíš až za závod.</p>
+  <div class="lgrid">
+    <form id="sf" class="panel" novalidate>
+      <div class="fields">
+        <label class="full" for="s-nick">Přezdívka do výsledků<input id="s-nick" required maxlength="24" placeholder="Třeba Rychlá Jana nebo Lesní šnek" autocomplete="nickname"></label>
+        <label for="s-fn">Jméno<input id="s-fn" required autocomplete="given-name"></label>
+        <label for="s-ln">Příjmení<input id="s-ln" required autocomplete="family-name"></label>
+        <label for="s-mail">E-mail<input id="s-mail" type="email" required autocomplete="email"></label>
+        <label for="s-year">Rok narození<input id="s-year" type="number" min="1920" max="2008" required inputmode="numeric"></label>
+        <label class="full" for="s-pass">Heslo (aspoň 8 znaků)<input id="s-pass" type="password" minlength="8" required autocomplete="new-password"></label>
+        <label class="full" for="s-team">Tým (nepovinné)<input id="s-team"></label>
+      </div>
+      <div class="checks">
+        <label class="ck"><input type="checkbox" id="s-c1" required><span>Souhlasím s <a href="pravidla.html" target="_blank" rel="noopener">pravidly</a> a <a href="podminky.html" target="_blank" rel="noopener">obchodními podmínkami</a>. Beru na vědomí <a href="gdpr.html" target="_blank" rel="noopener">zpracování osobních údajů</a>.</span></label>
+        <label class="ck"><input type="checkbox" id="s-c2" required><span>Je mi 18 let a zdravotní stav mi dovoluje běhat.</span></label>
+        <label class="ck"><input type="checkbox" id="s-c4"><span>Chci dostávat novinky o nových závodech (nepovinné).</span></label>
+      </div>
+      <p class="err" id="s-err" hidden></p>
+      <button class="btn lg" type="submit" style="justify-self:start">Vytvořit účet</button>
+      <p class="note">Už máš účet? <button type="button" class="linkbtn" data-go="login">Přihlas se</button></p>
+    </form>
+    <div class="panel" id="s-ok" hidden>
+      <h3>Zkontroluj e-mail</h3>
+      <p id="s-ok-t"></p>
+      <button class="btn g" type="button" data-go="login" style="justify-self:start">Přejít na přihlášení</button>
+    </div>
+    <div class="panel">
+      <h3>Co s účtem získáš</h3>
+      <ul class="chev"><li>Registraci do závodu na pár kliknutí</li><li>Deník běhů a nahrání výsledku screenem nebo souborem z hodinek</li><li>Výsledky pod přezdívkou a personalizované diplomy</li><li>Úspěchy a přehled, kam se ti běhy počítají</li></ul>
     </div>
   </div>
 </div></section>
@@ -2075,7 +2124,7 @@ function medal(ev,cls){return ev.img?'<img class="'+cls+' evimg" src="'+esc(ev.i
 function renderHome(){try{renderStarts()}catch(x){console.error(x)}}
 
 /* ---------- views ---------- */
-var views=["reg","login","acc","adm","res","dip"],now="home";
+var views=["reg","login","signup","acc","adm","res","dip"],now="home",afterLogin=null;
 function view(v){
  now=v;
  document.querySelectorAll("[data-home]").forEach(function(e){e.hidden=v!=="home"});
@@ -2087,7 +2136,7 @@ function view(v){
 }
 function nav(){
  $("nav-auth").textContent=me?(me.role==="admin"?"Administrace":"Můj účet"):"Přihlásit";
- $("nav-out").hidden=!me;
+ $("nav-out").hidden=!me;$("nav-reg").hidden=!!me;
  level();
 }
 var LV=[[0,"Nováček"],[10,"Rozběhaný"],[25,"Pravidelný běžec"],[50,"Vytrvalec"],[100,"Maratonec"],[250,"Ultra"],[500,"Legenda"],[1000,"Nezastavitelný"]];
@@ -2103,6 +2152,7 @@ function level(){
  $("lvl-track").setAttribute("aria-valuenow",pct);
 }
 function authView(){view(me?(me.role==="admin"?"adm":"acc"):"login")}
+function afterAuth(){if(afterLogin==="reg"&&me&&me.role!=="admin"&&R[cur]){afterLogin=null;form.hidden=false;$("done").hidden=true;renderReg();view("reg");return}afterLogin=null;authView()}
 
 /* ---------- registration ---------- */
 var form=$("rf"),sel=$("r-race"),reg=$("reg"),cur="test",dist=5,pack="start",pay="bank";
@@ -2135,9 +2185,9 @@ function renderReg(){
  $("r-dist").innerHTML=r.km.map(function(k){return opt("dist",k,k+" km",kmSub(k,ch),"",k===dist)}).join("");
  $("r-pack").innerHTML=Object.keys(P).map(function(k){return opt("pack",k,P[k].n,P[k].i,money(P[k].p),k===pack)}).join("");
  var logged=!!me;
- $("r-pass-l").hidden=logged;$("r-pass").required=!logged;$("r-mail").readOnly=logged;
+ $("r-pass-l").hidden=logged;$("r-haveacc").hidden=logged;$("r-pass").required=!logged;$("r-mail").readOnly=logged;
  if(logged&&!$("r-nick").value)$("r-nick").value=me.nick||"";
- if(logged){var p=me.name.split(" ");$("r-fn").value=p[0]||"";$("r-ln").value=p.slice(1).join(" ");$("r-mail").value=me.email}
+ if(logged){var p=me.name.split(" ");$("r-fn").value=p[0]||"";$("r-ln").value=p.slice(1).join(" ");$("r-mail").value=me.email;if(me.year&&!$("r-year").value)$("r-year").value=me.year;if(me.team&&!$("r-team").value)$("r-team").value=me.team}
  $("r-err").hidden=true;
  sync();
 }
@@ -2193,10 +2243,10 @@ $("lf").addEventListener("submit",function(e){
  e.preventDefault();
  var m=$("l-mail").value.trim().toLowerCase(),p=$("l-pass").value,u=null;
  if(LIVE){var lb2=$("lf").querySelector("button[type=submit]");lb2.disabled=true;
-  DB.login(m,p).then(function(){$("l-err").hidden=true;$("l-pass").value="";DB.refresh();authView()}).catch(function(err){$("l-err").textContent=DB.msg(err);$("l-err").hidden=false}).finally(function(){lb2.disabled=false});return}
+  DB.login(m,p).then(function(){$("l-err").hidden=true;$("l-pass").value="";DB.refresh();afterAuth()}).catch(function(err){$("l-err").textContent=DB.msg(err);$("l-err").hidden=false}).finally(function(){lb2.disabled=false});return}
  S.users.forEach(function(x){if(x.email===m&&x.pass===p)u=x});
  if(!u){$("l-err").textContent="E-mail nebo heslo nesedí. Zkus to znovu.";$("l-err").hidden=false;return}
- $("l-err").hidden=true;me=u;S.session=u.id;save();$("l-pass").value="";authView();
+ $("l-err").hidden=true;me=u;S.session=u.id;save();$("l-pass").value="";afterAuth();
 });
 
 /* ---------- runner account ---------- */
@@ -3039,6 +3089,13 @@ if(LIVE)DB=(function(){
   if(!p)return;try{localStorage.removeItem(PKEY)}catch(e){}
   try{var reg=await addReg(p.race,p.dist,p.nick);toast("E-mail je potvrzený a registrace uložená. Startovní číslo "+reg.bib+". Zaplať prosím startovné, QR platbu najdeš u závodu.")}catch(e){toast(msg(e),true)}
  }
+ async function signUp(o){
+  var s=await sb.auth.signUp({email:o.mail,password:o.pass,options:{data:{name:o.name,nick:o.nick,year:o.year,team:o.team,news:o.news},emailRedirectTo:location.origin+location.pathname+"#ucet"}});
+  if(s.error)throw s.error;
+  if(s.data.user&&s.data.user.identities&&!s.data.user.identities.length)throw new Error("already registered");
+  if(!s.data.session)return {confirm:true};
+  await load();return {};
+ }
  async function login(mail,pass){var r=await sb.auth.signInWithPassword({email:mail,password:pass});if(r.error)throw r.error;await load()}
  async function logout(){await sb.auth.signOut();await load()}
  async function resetMail(mail){var r=await sb.auth.resetPasswordForEmail(mail,{redirectTo:location.origin+location.pathname+"#nove-heslo"});if(r.error)throw r.error}
@@ -3062,7 +3119,7 @@ if(LIVE)DB=(function(){
   sb.auth.onAuthStateChange(function(ev){if(ev==="PASSWORD_RECOVERY")setTimeout(function(){view("login");showPassForm("new")},0)});
   if(/^#nove-heslo/.test(location.hash)||/type=recovery/.test(location.hash)){view("login");showPassForm("new")}
  }
- return {sb:sb,boot:boot,load:load,sync:sync,refresh:refresh,register:register,login:login,logout:logout,resetMail:resetMail,newPass:newPass,cleanup:cleanup,msg:msg};
+ return {sb:sb,signUp:signUp,boot:boot,load:load,sync:sync,refresh:refresh,register:register,login:login,logout:logout,resetMail:resetMail,newPass:newPass,cleanup:cleanup,msg:msg};
 })();
 
 /* ---------- drobné hlášky ---------- */
@@ -3124,7 +3181,8 @@ document.addEventListener("click",function(e){
  }
  var l=e.target.closest("a");if(!l)return;
  if(l.dataset.view==="res"){e.preventDefault();if(l.dataset.rr)rcur=l.dataset.rr;view("res");return}
- if(l.dataset.view==="auth"){e.preventDefault();authView();return}
+ if(l.dataset.view==="auth"){e.preventDefault();afterLogin=null;authView();return}
+ if(l.dataset.view==="signup"){e.preventDefault();if(me){authView();return}$("sf").hidden=false;$("s-ok").hidden=true;view("signup");return}
  if(l.dataset.view==="logout"){e.preventDefault();if(LIVE){DB.logout().then(function(){DB.refresh();view("home");window.scrollTo(0,0)});return}me=null;S.session=null;save();view("home");window.scrollTo(0,0);return}
  if(l.hasAttribute("data-race")){
   e.preventDefault();
@@ -3156,6 +3214,21 @@ $("csv-in").addEventListener("change",function(){var f=this.files[0];if(!f)retur
   if(hits.length){save();renderAdm()}inp.value=""})});
 $("clean-btn").addEventListener("click",function(){if(!LIVE)return;var b=this;b.disabled=true;$("clean-msg").textContent="Mažu…";
  DB.cleanup(30).then(function(n){$("clean-msg").textContent=n?"Smazáno "+n+" screenshotů.":"Nic ke smazání."}).catch(function(err){$("clean-msg").textContent=DB.msg(err)}).finally(function(){b.disabled=false})});
+document.addEventListener("click",function(e){var g=e.target.closest("[data-go]");if(!g)return;e.preventDefault();var t=g.dataset.go;
+ if(t==="signup"){$("sf").hidden=false;$("s-ok").hidden=true;view("signup");return}
+ if(t==="login-reg"){afterLogin="reg";$("l-mail").value=$("r-mail").value;showPassForm("login");view("login");return}
+ if(t==="login"){showPassForm("login");if(me){authView();return}view("login")}});
+$("sf").addEventListener("submit",function(e){e.preventDefault();var f=this,er=$("s-err");er.hidden=true;
+ var bad=[].slice.call(f.querySelectorAll("input")).filter(function(i){return !i.checkValidity()})[0];
+ if(bad){er.textContent=bad.type==="checkbox"?"Potvrď prosím povinné souhlasy.":bad.id==="s-pass"?"Heslo musí mít aspoň 8 znaků.":bad.id==="s-mail"?"Zkontroluj e-mail.":"Vyplň prosím všechna povinná pole.";er.hidden=false;bad.focus();return}
+ var o={mail:$("s-mail").value.trim().toLowerCase(),pass:$("s-pass").value,name:($("s-fn").value.trim()+" "+$("s-ln").value.trim()).trim(),nick:$("s-nick").value.trim(),year:+$("s-year").value||null,team:$("s-team").value.trim(),news:$("s-c4").checked};
+ if(!LIVE){if(S.users.some(function(u){return u.email===o.mail})){er.textContent="Účet s tímto e-mailem už existuje. Přihlas se.";er.hidden=false;return}
+  me={id:"u"+Date.now(),email:o.mail,pass:o.pass,name:o.name,nick:o.nick,year:o.year,team:o.team,role:"runner"};S.users.push(me);S.session=me.id;save();f.reset();toast("Účet je založený. Vítej, "+o.nick+".");afterAuth();return}
+ var b=f.querySelector("button[type=submit]");b.disabled=true;
+ DB.signUp(o).then(function(res){
+  if(res.confirm){f.hidden=true;$("s-ok-t").textContent="Na "+o.mail+" jsme poslali odkaz pro potvrzení účtu. Klikni na něj a pak se přihlas. Kdyby e-mail nepřišel do pár minut, mrkni do spamu.";$("s-ok").hidden=false;window.scrollTo(0,0);return}
+  f.reset();DB.refresh();toast("Účet je založený. Vítej, "+o.nick+".");afterAuth();
+ }).catch(function(err){er.textContent=DB.msg(err);er.hidden=false}).finally(function(){b.disabled=false})});
 if(LIVE){renderHome();nav();DB.boot().then(function(){DB.refresh();renderReg();if(/^#(ucet|admin)/.test(location.hash)&&me)authView()})}
 else{renderHome();renderReg();nav();}
 })();
