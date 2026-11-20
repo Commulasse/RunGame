@@ -3130,7 +3130,7 @@ if(LIVE)DB=(function(){
  /* ověření až po kliknutí – roboti, kteří kontrolují odkazy v poště, na tlačítko nekliknou */
  async function finishLink(link){
   var r=await sb.auth.verifyOtp({token_hash:link.th,type:link.type});
-  if(r.error){notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit.");view("login");showPassForm("login");return}
+  if(r.error){console.error("verifyOtp",link.type,r.error);notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit. (detail: "+(r.error.code||r.error.status||"")+" "+(r.error.message||"")+")");view("login");showPassForm("login");return}
   try{await load()}catch(e){}
   refresh();
   if(link.type==="recovery"){$("notice").hidden=true;view("login");showPassForm("new");return}
@@ -3143,7 +3143,7 @@ if(LIVE)DB=(function(){
   try{link=await fromLink()}catch(e){link={bad:msg(e)}}
   try{await load()}catch(e){console.error(e);toast("Nepodařilo se načíst data ze serveru: "+msg(e),true)}
   sb.auth.onAuthStateChange(function(ev){if(ev==="PASSWORD_RECOVERY")setTimeout(function(){view("login");showPassForm("new")},0)});
-  if(link&&link.bad){notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit.");view("login");showPassForm("login");return}
+  if(link&&link.bad){console.error("odkaz z e-mailu",link.bad);notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit. (detail: "+link.bad+")");view("login");showPassForm("login");return}
   if(link&&link.ask){
    var lbl=link.type==="recovery"?["Nastavení nového hesla","Pokračovat"]:link.type==="email_change"?["Potvrzení nového e-mailu","Potvrdit"]:["Poslední krok registrace","Aktivovat účet"];
    notice(lbl[0]+" – klikni na tlačítko:",lbl[1],function(){finishLink(link).catch(function(e){notice("Něco se pokazilo: "+msg(e))})});return}
