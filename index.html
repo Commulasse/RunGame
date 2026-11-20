@@ -1327,6 +1327,9 @@ html:not(.live) [data-live]{display:none!important}
 .qrpay>div{flex:1 1 220px;min-width:0}
 .csvimp{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0}
 .csvimp label.btn{cursor:pointer}
+#notice{position:relative;z-index:5;display:flex;gap:12px;align-items:center;justify-content:center;background:var(--lime);color:#0d0b14;padding:14px 48px 14px 16px;font-weight:700;font-size:1rem;text-align:center}
+#notice[hidden]{display:none}
+#notice button{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;color:#0d0b14;font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99;max-width:min(560px,calc(100vw - 32px));background:#15121f;color:#fff;border-left:3px solid var(--lime);padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:.92rem}
 #toast.bad{border-left-color:var(--red,#ff5470)}
 #toast[hidden]{display:none}
@@ -3124,19 +3127,23 @@ if(LIVE)DB=(function(){
   return r.error?{bad:r.error.message||"otp"}:{type:ty};
  }
  async function boot(){
-  var link=null,hadPend=false;try{hadPend=!!localStorage.getItem(PKEY)}catch(e){}
+  var link=null;
   try{link=await fromLink()}catch(e){link={bad:msg(e)}}
   try{await load()}catch(e){console.error(e);toast("Nepodařilo se načíst data ze serveru: "+msg(e),true)}
   sb.auth.onAuthStateChange(function(ev){if(ev==="PASSWORD_RECOVERY")setTimeout(function(){view("login");showPassForm("new")},0)});
   if(link&&link.bad){toast("Odkaz z e-mailu už neplatí (vypršel nebo byl použit). Přihlas se, případně si nech poslat nový.",true);view("login");showPassForm("login");return}
   if(link&&link.type==="recovery"){view("login");showPassForm("new");return}
-  if(link&&me&&!hadPend){toast(link.type==="email_change"?"Nový e-mail je potvrzený.":"E-mail je potvrzený. Vítej v RunGame, "+(me.nick||me.name)+"!");return}
+  if(link&&link.type==="email_change"){notice("✓ Nový e-mail je potvrzený.");return}
+  if(link&&me){notice("✓ Účet je aktivovaný. Vítej v RunGame, "+(me.nick||me.name)+"!");return}
+  if(link){notice("✓ Účet je aktivovaný. Teď se přihlas.");view("login");showPassForm("login");return}
   if(/^#nove-heslo/.test(location.hash)||/type=recovery/.test(location.hash)){view("login");showPassForm("new")}
  }
  return {sb:sb,signUp:signUp,boot:boot,load:load,sync:sync,refresh:refresh,register:register,login:login,logout:logout,resetMail:resetMail,newPass:newPass,cleanup:cleanup,msg:msg};
 })();
 
 /* ---------- drobné hlášky ---------- */
+function notice(t){var el=$("notice");if(!el){el=document.createElement("div");el.id="notice";el.setAttribute("role","status");el.innerHTML='<span></span><button type="button" aria-label="Zavřít">×</button>';el.querySelector("button").addEventListener("click",function(){el.hidden=true});var hd=$("top");hd.parentNode.insertBefore(el,hd.nextSibling)}
+ el.querySelector("span").textContent=t;el.hidden=false;window.scrollTo(0,0)}
 function toast(t,bad){var el=$("toast");if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");document.body.appendChild(el)}
  el.textContent=t;el.className=bad?"bad":"";el.hidden=false;clearTimeout(el._t);el._t=setTimeout(function(){el.hidden=true},bad?9000:6000)}
 
