@@ -1332,6 +1332,15 @@ html:not(.live) [data-live]{display:none!important}
 #notice .nb{background:#0d0b14;color:var(--lime);border:0;padding:10px 18px;font-weight:700;font-size:.95rem;cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
 #notice .nb[disabled]{opacity:.6;cursor:wait}
 #notice>button:last-child{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:0;color:#0d0b14;font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px}
+#lmodal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,5,10,.72);backdrop-filter:blur(3px) grayscale(.6);-webkit-backdrop-filter:blur(3px) grayscale(.6)}
+#lmodal[hidden]{display:none}
+#lmodal .box{position:relative;width:min(460px,100%);background:#15121f;border-top:4px solid var(--lime);padding:34px 28px 28px;box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:center}
+#lmodal h2{font-family:var(--display);text-transform:uppercase;font-size:2.2rem;line-height:1.05;margin:0 0 10px;color:#fff}
+#lmodal p{margin:0 0 22px;color:var(--lav)}
+#lmodal .btn{font-size:1rem;padding:14px 28px;text-transform:uppercase;letter-spacing:.04em}
+#lmodal .btn[disabled]{opacity:.6;cursor:wait}
+#lmodal .x{position:absolute;right:10px;top:8px;background:none;border:0;color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;padding:6px 10px;opacity:.7}
+#lmodal .x:hover{opacity:1}
 #toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99;max-width:min(560px,calc(100vw - 32px));background:#15121f;color:#fff;border-left:3px solid var(--lime);padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:.92rem}
 #toast.bad{border-left-color:var(--red,#ff5470)}
 #toast[hidden]{display:none}
@@ -3146,14 +3155,19 @@ if(LIVE)DB=(function(){
   sb.auth.onAuthStateChange(function(ev){if(ev==="PASSWORD_RECOVERY")setTimeout(function(){view("login");showPassForm("new")},0)});
   if(link&&link.bad){console.error("odkaz z e-mailu",link.bad);notice("Tenhle odkaz už byl použitý nebo vypršel. Pokud jsi účet už aktivoval(a), stačí se přihlásit. (detail: "+link.bad+")");view("login");showPassForm("login");return}
   if(link&&link.ask){
-   var lbl=link.type==="recovery"?["Nastavení nového hesla","Pokračovat"]:link.type==="email_change"?["Potvrzení nového e-mailu","Potvrdit"]:["Poslední krok registrace","Aktivovat účet"];
-   notice(lbl[0]+" – klikni na tlačítko:",lbl[1],function(){finishLink(link).catch(function(e){notice("Něco se pokazilo: "+msg(e))})});return}
+   var lbl=link.type==="recovery"?["Nové heslo","Klikni a nastav si nové heslo k účtu.","Pokračovat"]:link.type==="email_change"?["Nový e-mail","Potvrď změnu e-mailu u svého účtu.","Potvrdit"]:["Aktivace účtu","Poslední krok registrace. Klikni a můžeš začít závodit.","Aktivovat účet"];
+   lmodal(lbl[0],lbl[1],lbl[2],function(){return finishLink(link).catch(function(e){notice("Něco se pokazilo: "+msg(e))})});return}
   if(/^#nove-heslo/.test(location.hash)||/type=recovery/.test(location.hash)){view("login");showPassForm("new")}
  }
  return {sb:sb,signUp:signUp,boot:boot,load:load,sync:sync,refresh:refresh,register:register,login:login,logout:logout,resetMail:resetMail,newPass:newPass,cleanup:cleanup,msg:msg};
 })();
 
 /* ---------- drobné hlášky ---------- */
+function lmodal(h,t,btn,fn){var el=$("lmodal");if(!el){el=document.createElement("div");el.id="lmodal";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");
+ el.innerHTML='<div class="box"><button type="button" class="x" aria-label="Zavřít">×</button><h2></h2><p></p><button type="button" class="btn go"></button></div>';
+ el.querySelector(".x").addEventListener("click",function(){el.hidden=true});document.body.appendChild(el)}
+ el.querySelector("h2").textContent=h;el.querySelector("p").textContent=t;var b=el.querySelector(".go");b.textContent=btn;b.disabled=false;
+ b.onclick=function(){b.disabled=true;b.textContent="Chvilku…";Promise.resolve(fn()).finally(function(){el.hidden=true})};el.hidden=false;b.focus()}
 function notice(t,btn,fn){var el=$("notice");if(!el){el=document.createElement("div");el.id="notice";el.setAttribute("role","status");el.innerHTML='<span></span><button type="button" aria-label="Zavřít">×</button>';el.querySelector("button").addEventListener("click",function(){el.hidden=true});var hd=$("top");hd.parentNode.insertBefore(el,hd.nextSibling)}
  el.querySelector("span").textContent=t;var b=el.querySelector(".nb");if(b)b.remove();
  if(btn){b=document.createElement("button");b.type="button";b.className="nb";b.textContent=btn;b.addEventListener("click",function(){b.disabled=true;fn()});el.querySelector("span").after(b)}
