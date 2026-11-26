@@ -67,6 +67,8 @@
 }
 html{font-synthesis:style}
 *{box-sizing:border-box}
+html,body{overflow-x:clip}
+fieldset{min-width:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55}
 .w{max-width:1240px;margin-inline:auto;padding-inline:16px}
 h1,h2,h3{font-family:var(--display);font-weight:400;font-style:italic;text-transform:uppercase;line-height:.95;margin:0;letter-spacing:.01em;text-wrap:balance}
@@ -1052,7 +1054,7 @@ h1,h2,h3{font-style:normal}
 .rsel{display:grid;gap:6px;font-size:.66rem;color:var(--muted)}
 .rsel select{font:inherit;font-family:var(--body);text-transform:none;letter-spacing:0;font-size:.85rem;background:#0c0a12;color:#fff;border:1px solid #4a4363;padding:9px 10px;min-width:240px}
 .rt2{border:1px solid #2a2636}
-.rt2 table{width:100%;border-collapse:collapse;font-size:.9rem}
+.rt2 table{width:100%;min-width:0;border-collapse:collapse;font-size:.9rem}
 .rt2 th{font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;text-align:left;padding:10px 12px;background:#15121f;border-bottom:1px solid #2a2636}
 .rt2 td{padding:14px 12px;border-bottom:1px solid #1f1b2b;font-variant-numeric:tabular-nums}
 .rt2 tr:last-child td{border-bottom:0}
@@ -1506,8 +1508,7 @@ html:not(.live) [data-live]{display:none!important}
       <fieldset><legend>Účet závodníka<i>.</i></legend>
         <p class="havacc" id="r-haveacc">Už máš účet? <button type="button" class="linkbtn" data-go="login-reg">Přihlas se</button> a údaje se vyplní samy.</p>
         <div class="fields">
-          <label for="r-mail">E-mail<input id="r-mail" name="mail" type="email" required autocomplete="email"></label>
-          <label for="r-year">Rok narození<input id="r-year" name="year" type="number" min="1920" max="2008" required inputmode="numeric"></label>
+          <label class="full" for="r-mail">E-mail<input id="r-mail" name="mail" type="email" required autocomplete="email"></label>
           <label class="full" for="r-pass" id="r-pass-l">Heslo k účtu závodníka (aspoň 8 znaků)<input id="r-pass" name="pass" type="password" minlength="8" autocomplete="new-password"></label>
           <label class="full" for="r-team">Tým (nepovinné)<input id="r-team" name="team"></label>
         </div>
@@ -1522,10 +1523,9 @@ html:not(.live) [data-live]{display:none!important}
       </fieldset>
       <fieldset><legend>Souhlasy<i>.</i></legend>
         <div class="checks">
-          <label for="c1"><input type="checkbox" id="c1" required>Souhlasím s <a href="pravidla.html" target="_blank" rel="noopener">pravidly závodu</a> a <a href="podminky.html" target="_blank" rel="noopener">obchodními podmínkami</a>. Beru na vědomí <a href="gdpr.html" target="_blank" rel="noopener">zpracování osobních údajů</a>.</label>
-          <label for="c2"><input type="checkbox" id="c2" required>Potvrzuji, že mi je 18 let a můj zdravotní stav mi účast dovoluje.</label>
-          <label for="c3"><input type="checkbox" id="c3" required>Beru na vědomí, že moje přezdívka a výsledek budou ve veřejné výsledkové tabulce.</label>
-          <label for="c4"><input type="checkbox" id="c4">Chci dostávat novinky o dalších závodech. (nepovinné)</label>
+          <label for="c1"><input type="checkbox" id="c1" required><span>Souhlasím s <a href="pravidla.html" target="_blank" rel="noopener">pravidly závodu</a> a <a href="podminky.html" target="_blank" rel="noopener">obchodními podmínkami</a>. Beru na vědomí <a href="gdpr.html" target="_blank" rel="noopener">zpracování osobních údajů</a>.</span></label>
+          <label for="c3"><input type="checkbox" id="c3" required><span>Beru na vědomí, že moje přezdívka a výsledek budou ve veřejné výsledkové tabulce.</span></label>
+          <label for="c4"><input type="checkbox" id="c4"><span>Chci dostávat novinky o dalších závodech. (nepovinné)</span></label>
         </div>
       </fieldset>
     </div>
@@ -1620,14 +1620,12 @@ html:not(.live) [data-live]{display:none!important}
         <label class="full" for="s-nick">Přezdívka do výsledků<input id="s-nick" required maxlength="24" placeholder="Třeba Rychlá Jana nebo Lesní šnek" autocomplete="nickname"></label>
         <label for="s-fn">Jméno<input id="s-fn" required autocomplete="given-name"></label>
         <label for="s-ln">Příjmení<input id="s-ln" required autocomplete="family-name"></label>
-        <label for="s-mail">E-mail<input id="s-mail" type="email" required autocomplete="email"></label>
-        <label for="s-year">Rok narození<input id="s-year" type="number" min="1920" max="2008" required inputmode="numeric"></label>
+        <label class="full" for="s-mail">E-mail<input id="s-mail" type="email" required autocomplete="email"></label>
         <label class="full" for="s-pass">Heslo (aspoň 8 znaků)<input id="s-pass" type="password" minlength="8" required autocomplete="new-password"></label>
         <label class="full" for="s-team">Tým (nepovinné)<input id="s-team"></label>
       </div>
       <div class="checks">
         <label class="ck"><input type="checkbox" id="s-c1" required><span>Souhlasím s <a href="pravidla.html" target="_blank" rel="noopener">pravidly</a> a <a href="podminky.html" target="_blank" rel="noopener">obchodními podmínkami</a>. Beru na vědomí <a href="gdpr.html" target="_blank" rel="noopener">zpracování osobních údajů</a>.</span></label>
-        <label class="ck"><input type="checkbox" id="s-c2" required><span>Je mi 18 let a zdravotní stav mi dovoluje běhat.</span></label>
         <label class="ck"><input type="checkbox" id="s-c4"><span>Chci dostávat novinky o nových závodech (nepovinné).</span></label>
       </div>
       <p class="err" id="s-err" hidden></p>
@@ -2201,7 +2199,7 @@ function renderReg(){
  var logged=!!me;
  $("r-pass-l").hidden=logged;$("r-haveacc").hidden=logged;$("r-pass").required=!logged;$("r-mail").readOnly=logged;
  if(logged&&!$("r-nick").value)$("r-nick").value=me.nick||"";
- if(logged){var p=me.name.split(" ");$("r-fn").value=p[0]||"";$("r-ln").value=p.slice(1).join(" ");$("r-mail").value=me.email;if(me.year&&!$("r-year").value)$("r-year").value=me.year;if(me.team&&!$("r-team").value)$("r-team").value=me.team}
+ if(logged){var p=me.name.split(" ");$("r-fn").value=p[0]||"";$("r-ln").value=p.slice(1).join(" ");$("r-mail").value=me.email;if(me.team&&!$("r-team").value)$("r-team").value=me.team}
  $("r-err").hidden=true;
  sync();
 }
@@ -2230,7 +2228,7 @@ form.addEventListener("submit",function(e){
  $("r-err").hidden=true;
  if(LIVE){
   var sbtn=form.querySelector('button[type=submit]'),nk0=$("r-nick").value.trim(),rc=R[cur];sbtn.disabled=true;
-  DB.register({mail:mail,pass:$("r-pass").value,name:name,nick:nk0,year:+$("r-year").value||null,team:$("r-team").value.trim(),news:$("c4").checked,race:cur,dist:dist}).then(function(res){
+  DB.register({mail:mail,pass:$("r-pass").value,name:name,nick:nk0,year:null,team:$("r-team").value.trim(),news:$("c4").checked,race:cur,dist:dist}).then(function(res){
    if(res.confirm){$("d-text").textContent="Účet je založený. Poslali jsme ti e-mail s odkazem pro potvrzení. Po kliknutí na odkaz se ti registrace do závodu "+rc.n+" uloží a dostaneš startovní číslo.";$("d-pay").innerHTML=""}
    else{var r=res.reg;$("d-text").textContent=nk0+", jsi přihlášen(a) na "+rc.n+" ("+rc.d+"), trať "+r.dist+" km. Tvoje startovní číslo je "+r.bib+", posíláme ti ho i e-mailem. Registrace začne platit po připsání platby. Po splnění závodu dostaneš personalizovaný diplom.";$("d-pay").innerHTML=payBox(r)}
    form.hidden=true;$("done").hidden=false;window.scrollTo(0,0);$("done").focus();DB.refresh();
@@ -3269,8 +3267,8 @@ document.addEventListener("click",function(e){var g=e.target.closest("[data-go]"
  if(t==="login"){showPassForm("login");if(me){authView();return}view("login")}});
 $("sf").addEventListener("submit",function(e){e.preventDefault();var f=this,er=$("s-err");er.hidden=true;
  var bad=[].slice.call(f.querySelectorAll("input")).filter(function(i){return !i.checkValidity()})[0];
- if(bad){er.textContent=bad.type==="checkbox"?"Potvrď prosím povinné souhlasy.":bad.id==="s-pass"?"Heslo musí mít aspoň 8 znaků.":bad.id==="s-mail"?"Zkontroluj e-mail.":bad.id==="s-year"&&bad.value?"Registrovat se můžou jen lidé starší 18 let (rok narození 1920–2008).":"Vyplň prosím všechna povinná pole.";er.hidden=false;bad.focus();return}
- var o={mail:$("s-mail").value.trim().toLowerCase(),pass:$("s-pass").value,name:($("s-fn").value.trim()+" "+$("s-ln").value.trim()).trim(),nick:$("s-nick").value.trim(),year:+$("s-year").value||null,team:$("s-team").value.trim(),news:$("s-c4").checked};
+ if(bad){er.textContent=bad.type==="checkbox"?"Potvrď prosím povinné souhlasy.":bad.id==="s-pass"?"Heslo musí mít aspoň 8 znaků.":bad.id==="s-mail"?"Zkontroluj e-mail.":"Vyplň prosím všechna povinná pole.";er.hidden=false;bad.focus();return}
+ var o={mail:$("s-mail").value.trim().toLowerCase(),pass:$("s-pass").value,name:($("s-fn").value.trim()+" "+$("s-ln").value.trim()).trim(),nick:$("s-nick").value.trim(),year:null,team:$("s-team").value.trim(),news:$("s-c4").checked};
  if(!LIVE){if(S.users.some(function(u){return u.email===o.mail})){er.textContent="Účet s tímto e-mailem už existuje. Přihlas se.";er.hidden=false;return}
   me={id:"u"+Date.now(),email:o.mail,pass:o.pass,name:o.name,nick:o.nick,year:o.year,team:o.team,role:"runner"};S.users.push(me);S.session=me.id;save();f.reset();toast("Účet je založený. Vítej, "+o.nick+".");afterAuth();return}
  var b=f.querySelector("button[type=submit]");b.disabled=true;
